@@ -210,12 +210,15 @@
     <form
       id="orderForm"
       class="card"
-      name="sticker-order"
       method="POST"
-      data-netlify="true"
-      action="success.html"
+      action="https://formspree.io/f/mykdggqy"
     >
-      <input type="hidden" name="form-name" value="sticker-order">
+      <!-- redirect back to success page after a good submit -->
+      <input
+        type="hidden"
+        name="_redirect"
+        value="https://omnicultcs-droid.github.io/Omni-Cult-Sticker-Order-Form/success.html"
+      />
       <input type="hidden" name="items" id="itemsField">
 
       <div class="order-grid">
