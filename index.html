@@ -219,6 +219,7 @@
         name="_redirect"
         value="https://omnicultcs-droid.github.io/Omni-Cult-Sticker-Order-Form/success.html"
       />
+      <!-- clean list of selections goes here -->
       <input type="hidden" name="items" id="itemsField">
 
       <div class="order-grid">
@@ -271,16 +272,20 @@
       let count = 0;
       const selections = {};
 
+      // Load designs.json and normalize names for fuzzy-ish search
       fetch("designs.json")
         .then(r => r.json())
         .then(data => {
           all = data.map((d, i) => {
             const raw = d.img || d.image || d.src || d.file || "";
-            const name = raw.substring(raw.lastIndexOf("/") + 1).replace(/\.[^.]+$/, "");
+            const base = raw.substring(raw.lastIndexOf("/") + 1).replace(/\.[^.]+$/, "");
+            const display = base;
+            const search = base.toLowerCase();
+            const norm = search.replace(/[^a-z0-9]+/g, ""); // for vague search
             const img = raw.includes("/") ? raw : "img/" + raw;
-            return { key: i, name: name.toLowerCase(), display: name, img };
+            return { key: i, display, search, norm, img };
           });
-          all.sort((a,b)=>a.display.localeCompare(b.display));
+          all.sort((a, b) => a.display.localeCompare(b.display));
           filtered = all.slice();
           renderMore();
         });
@@ -313,8 +318,8 @@
           </div>
         `;
 
-        const checkbox = card.querySelector(`input[name="${checkboxName}"]`);
-        const qty = card.querySelector(`select[name="${qtyName}"]`);
+        const checkbox = card.querySelector(\`input[name="\${checkboxName}"]\`);
+        const qty = card.querySelector(\`select[name="\${qtyName}"]\`);
 
         checkbox.addEventListener("change", () => {
           if (checkbox.checked && qty.value === "0") qty.value = "1";
@@ -354,11 +359,24 @@
         }
       }
 
+      // Vague, case-insensitive search (ignores punctuation, hyphens, etc.)
       searchInput.addEventListener("input", () => {
-        const q = searchInput.value.toLowerCase().trim();
+        const qRaw = searchInput.value.trim().toLowerCase();
+        const s = qRaw.replace(/[^a-z0-9]+/g, "");
+
         gallery.innerHTML = "";
         count = 0;
-        filtered = q ? all.filter(d => d.display.includes(q)) : all.slice();
+
+        if (!s) {
+          filtered = all.slice();
+        } else {
+          filtered = all.filter(d => {
+            // match if raw lowercased contains query,
+            // OR fully normalized (no punctuation) contains normalized query
+            return d.search.includes(qRaw) || d.norm.includes(s);
+          });
+        }
+
         loadMoreBtn.style.display = filtered.length > PAGE_SIZE ? "inline-block" : "none";
         renderMore();
       });
@@ -367,10 +385,11 @@
 
       document.getElementById("orderForm").addEventListener("submit", e => {
         const items = Object.entries(selections)
-          .map(([k,v]) => {
+          .map(([k, v]) => {
             const d = all.find(x => x.key == k);
-            return `${d.display} x ${v}`;
-          });
+            return d ? \`\${d.display} x \${v}\` : "";
+          })
+          .filter(Boolean);
 
         if (!items.length) {
           e.preventDefault();
@@ -379,7 +398,16 @@
           return;
         }
 
+        // Put clean list into the hidden field
         itemsField.value = items.join("\n");
+
+        // Disable all design_* fields so Formspree doesn't email the noise
+        const extraFields = document.querySelectorAll(
+          'input[name^="design_"], select[name^="design_"]'
+        );
+        extraFields.forEach(el => {
+          el.disabled = true;
+        });
       });
 
       window.addEventListener("resize", padGrid);
