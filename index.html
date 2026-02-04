@@ -82,7 +82,6 @@
       font-size: 0.9rem;
     }
 
-    /* FIXED EVEN GRID */
     .gallery {
       display: grid;
       gap: 12px;
@@ -219,7 +218,7 @@
         name="_redirect"
         value="https://omnicultcs-droid.github.io/Omni-Cult-Sticker-Order-Form/success.html"
       />
-      <!-- clean list of selections goes here -->
+      <!-- Clean list of selections goes here -->
       <input type="hidden" name="items" id="itemsField">
 
       <div class="order-grid">
@@ -307,25 +306,29 @@
         const card = document.createElement("div");
         card.className = "design-card";
 
-        const checkboxName = "design_" + design.key + "_sel";
-        const qtyName = "design_" + design.key + "_qty";
-
         card.innerHTML = `
           <div class="thumb-wrapper"><img src="${design.img}"></div>
           <div class="design-name">${design.display}</div>
           <div class="design-controls">
-            <label><input type="checkbox" name="${checkboxName}" value="1"> Select</label>
+            <label><input type="checkbox" class="design-select" data-key="${design.key}"> Select</label>
             <label>Qty
-              <select name="${qtyName}">
+              <select class="design-qty" data-key="${design.key}">
                 ${Array.from({length:100},(_,x)=>`<option value="${x}">${x}</option>`).join("")}
               </select>
             </label>
           </div>
         `;
 
-        // use normal strings here to avoid template literal parsing issues
-        const checkbox = card.querySelector('input[name="' + checkboxName + '"]');
-        const qty = card.querySelector('select[name="' + qtyName + '"]');
+        const checkbox = card.querySelector(".design-select");
+        const qty = card.querySelector(".design-qty");
+
+        // Restore previous selection state, if any
+        if (Object.prototype.hasOwnProperty.call(selections, design.key)) {
+          const existingQty = selections[design.key];
+          checkbox.checked = true;
+          qty.value = String(existingQty);
+          card.classList.add("selected");
+        }
 
         checkbox.addEventListener("change", () => {
           if (checkbox.checked && qty.value === "0") qty.value = "1";
@@ -377,11 +380,17 @@
           filtered = all.slice();
         } else {
           filtered = all.filter(d => {
-            // match if raw lowercased contains query,
-            // OR fully normalized (no punctuation) contains normalized query
             return d.search.includes(qRaw) || d.norm.includes(s);
           });
         }
+
+        // Drop selections that are no longer visible
+        const visibleKeys = new Set(filtered.map(d => String(d.key)));
+        Object.keys(selections).forEach(k => {
+          if (!visibleKeys.has(String(k))) {
+            delete selections[k];
+          }
+        });
 
         loadMoreBtn.style.display = filtered.length > PAGE_SIZE ? "inline-block" : "none";
         renderMore();
@@ -393,7 +402,7 @@
         const items = Object.entries(selections)
           .map(([k, v]) => {
             const d = all.find(x => x.key == k);
-            return d ? (d.display + " x " + v) : "";
+            return d ? `${d.display} x ${v}` : "";
           })
           .filter(Boolean);
 
@@ -406,14 +415,7 @@
 
         // Put clean list into the hidden field
         itemsField.value = items.join("\n");
-
-        // Disable all design_* fields so Formspree doesn't email the noise
-        const extraFields = document.querySelectorAll(
-          'input[name^="design_"], select[name^="design_"]'
-        );
-        extraFields.forEach(el => {
-          el.disabled = true;
-        });
+        // No disabling / mutating of fields – keeps Back button behavior normal
       });
 
       window.addEventListener("resize", padGrid);
