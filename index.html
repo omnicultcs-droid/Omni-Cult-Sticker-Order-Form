@@ -288,6 +288,11 @@
           all.sort((a, b) => a.display.localeCompare(b.display));
           filtered = all.slice();
           renderMore();
+        })
+        .catch(err => {
+          console.error("Error loading designs.json", err);
+          formStatus.textContent = "Error loading sticker list.";
+          formStatus.classList.add("error");
         });
 
       function renderMore() {
@@ -302,8 +307,8 @@
         const card = document.createElement("div");
         card.className = "design-card";
 
-        const checkboxName = `design_${design.key}_sel`;
-        const qtyName = `design_${design.key}_qty`;
+        const checkboxName = "design_" + design.key + "_sel";
+        const qtyName = "design_" + design.key + "_qty";
 
         card.innerHTML = `
           <div class="thumb-wrapper"><img src="${design.img}"></div>
@@ -318,8 +323,9 @@
           </div>
         `;
 
-        const checkbox = card.querySelector(\`input[name="\${checkboxName}"]\`);
-        const qty = card.querySelector(\`select[name="\${qtyName}"]\`);
+        // use normal strings here to avoid template literal parsing issues
+        const checkbox = card.querySelector('input[name="' + checkboxName + '"]');
+        const qty = card.querySelector('select[name="' + qtyName + '"]');
 
         checkbox.addEventListener("change", () => {
           if (checkbox.checked && qty.value === "0") qty.value = "1";
@@ -387,7 +393,7 @@
         const items = Object.entries(selections)
           .map(([k, v]) => {
             const d = all.find(x => x.key == k);
-            return d ? \`\${d.display} x \${v}\` : "";
+            return d ? (d.display + " x " + v) : "";
           })
           .filter(Boolean);
 
