@@ -37,14 +37,6 @@
       margin: 0 auto;
     }
 
-    .logo-caption {
-      margin-top: 4px;
-      font-size: 0.75rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: #9ca3af;
-    }
-
     h1 {
       margin: 10px 0 4px;
       font-size: 1.9rem;
@@ -73,9 +65,22 @@
       .order-grid { grid-template-columns: repeat(2, 1fr); }
     }
 
+    /* Address grid: street, state, zip */
+    .address-grid {
+      display: grid;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    @media (min-width: 720px) {
+      .address-grid {
+        grid-template-columns: 2fr 1fr 1fr;
+      }
+    }
+
     input[type="text"],
     input[type="email"],
-    textarea {
+    textarea,
+    select {
       width: 100%;
       padding: 8px 9px;
       border-radius: 6px;
@@ -98,13 +103,7 @@
       color: #d1d5db;
     }
     .search-row input {
-      width: 100%;
       padding: 7px 9px;
-      border-radius: 6px;
-      border: 1px solid #374151;
-      background: #020617;
-      color: #f9fafb;
-      font-size: 0.9rem;
     }
 
     .toolbar {
@@ -145,7 +144,7 @@
 
     .design-card.selected {
       border-color: #22c55e;
-      box-shadow: 0 0 6px rgba(34,197,94,0.5);
+      box-shadow: 0 0 10px rgba(163, 230, 53, 0.7);
     }
 
     .design-card.placeholder {
@@ -187,10 +186,6 @@
       width: 62px;
       padding: 3px 5px;
       font-size: 0.7rem;
-      background: #020617;
-      color: #f9fafb;
-      border-radius: 6px;
-      border: 1px solid #374151;
     }
 
     .remove-btn {
@@ -198,9 +193,9 @@
       align-self: flex-end;
       padding: 3px 8px;
       border-radius: 999px;
-      border: 1px solid #4b5563;
+      border: 1px solid #f472b6;
       background: #111827;
-      color: #e5e7eb;
+      color: #f9fafb;
       font-size: 0.65rem;
       cursor: pointer;
       display: none;
@@ -210,13 +205,13 @@
       display: inline-block;
     }
 
-    /* Buttons – unified Omni-Cult green accent */
+    /* Buttons – match logo neon green + magenta */
     .submit-btn {
       margin-top: 14px;
       padding: 12px 18px;
       border-radius: 999px;
-      border: 1px solid #22c55e;
-      background: #22c55e;
+      border: 1px solid #f472b6;
+      background: linear-gradient(135deg, #a3e635, #22c55e);
       color: #020617;
       font-weight: 800;
       cursor: pointer;
@@ -224,8 +219,12 @@
       width: 100%;
       letter-spacing: 0.04em;
       text-transform: uppercase;
+      box-shadow: 0 0 14px rgba(244, 114, 182, 0.45);
     }
-    .submit-btn:hover { filter: brightness(1.07); }
+    .submit-btn:hover {
+      filter: brightness(1.08);
+      box-shadow: 0 0 18px rgba(244, 114, 182, 0.7);
+    }
 
     .load-more-wrap {
       text-align: center;
@@ -238,23 +237,26 @@
       border: 1px solid #22c55e;
       background: #0b1120;
       font-weight: 700;
-      color: #22c55e;
+      color: #a3e635;
       cursor: pointer;
       font-size: 0.95rem;
+      box-shadow: 0 0 10px rgba(34, 197, 94, 0.4);
     }
     .load-more-btn:hover { background: #111827; }
 
     .clear-all-btn {
       padding: 6px 14px;
       border-radius: 999px;
-      border: 1px solid #f97316;
+      border: 1px solid #f472b6;
       background: #111827;
-      color: #fed7aa;
+      color: #fed7f2;
       font-size: 0.75rem;
       cursor: pointer;
       white-space: nowrap;
     }
-    .clear-all-btn:hover { background: #7c2d12; }
+    .clear-all-btn:hover {
+      background: #1f2937;
+    }
 
     .status {
       margin-top: 6px;
@@ -287,7 +289,6 @@
       <div class="logo-wrapper">
         <!-- logo.png lives next to index.html -->
         <img src="logo.png" alt="Omni-Cult logo" class="logo">
-        <div class="logo-caption">Sticker order form</div>
       </div>
       <h1>Sticker Order Form</h1>
       <p>Select stickers, tick the box, and choose quantities (0–99). Colors may vary; pink line = sticker shape.</p>
@@ -313,9 +314,10 @@
       />
       <!-- list of chosen items -->
       <input type="hidden" name="items" id="itemsField" />
-      <!-- CC the customer (Formspree may ignore this on free plan, but it's safe) -->
+      <!-- CC the customer (may be ignored on free tier, but harmless) -->
       <input type="hidden" name="_cc" id="ccField" />
 
+      <!-- Name + email -->
       <div class="order-grid">
         <div>
           <label>Name</label>
@@ -324,6 +326,74 @@
         <div>
           <label>Email</label>
           <input name="email" type="email" required autocomplete="email">
+        </div>
+      </div>
+
+      <!-- Address (optional) -->
+      <div class="address-grid">
+        <div>
+          <label>Street address (optional)</label>
+          <input name="street" type="text" autocomplete="street-address">
+        </div>
+        <div>
+          <label>State (optional)</label>
+          <select name="state" id="stateSelect">
+            <option value="">Select state</option>
+            <option value="AL">Alabama</option>
+            <option value="AK">Alaska</option>
+            <option value="AZ">Arizona</option>
+            <option value="AR">Arkansas</option>
+            <option value="CA">California</option>
+            <option value="CO">Colorado</option>
+            <option value="CT">Connecticut</option>
+            <option value="DE">Delaware</option>
+            <option value="FL">Florida</option>
+            <option value="GA">Georgia</option>
+            <option value="HI">Hawaii</option>
+            <option value="ID">Idaho</option>
+            <option value="IL">Illinois</option>
+            <option value="IN">Indiana</option>
+            <option value="IA">Iowa</option>
+            <option value="KS">Kansas</option>
+            <option value="KY">Kentucky</option>
+            <option value="LA">Louisiana</option>
+            <option value="ME">Maine</option>
+            <option value="MD">Maryland</option>
+            <option value="MA">Massachusetts</option>
+            <option value="MI">Michigan</option>
+            <option value="MN">Minnesota</option>
+            <option value="MS">Mississippi</option>
+            <option value="MO">Missouri</option>
+            <option value="MT">Montana</option>
+            <option value="NE">Nebraska</option>
+            <option value="NV">Nevada</option>
+            <option value="NH">New Hampshire</option>
+            <option value="NJ">New Jersey</option>
+            <option value="NM">New Mexico</option>
+            <option value="NY">New York</option>
+            <option value="NC">North Carolina</option>
+            <option value="ND">North Dakota</option>
+            <option value="OH">Ohio</option>
+            <option value="OK">Oklahoma</option>
+            <option value="OR">Oregon</option>
+            <option value="PA">Pennsylvania</option>
+            <option value="RI">Rhode Island</option>
+            <option value="SC">South Carolina</option>
+            <option value="SD">South Dakota</option>
+            <option value="TN">Tennessee</option>
+            <option value="TX">Texas</option>
+            <option value="UT">Utah</option>
+            <option value="VT">Vermont</option>
+            <option value="VA">Virginia</option>
+            <option value="WA">Washington</option>
+            <option value="WV">West Virginia</option>
+            <option value="WI">Wisconsin</option>
+            <option value="WY">Wyoming</option>
+          </select>
+        </div>
+        <div>
+          <label>Zip code (optional)</label>
+          <input name="zip" type="text" inputmode="numeric" autocomplete="postal-code">
         </div>
       </div>
 
@@ -374,6 +444,9 @@
       const emailInput = orderForm.querySelector('input[name="email"]');
       const nameInput = orderForm.querySelector('input[name="name"]');
       const notesInput = orderForm.querySelector('textarea[name="notes"]');
+      const streetInput = orderForm.querySelector('input[name="street"]');
+      const stateSelect = orderForm.querySelector('select[name="state"]');
+      const zipInput = orderForm.querySelector('input[name="zip"]');
       const ccField = document.getElementById("ccField");
       const selectionSummary = document.getElementById("selectionSummary");
 
@@ -392,7 +465,10 @@
             form: {
               name: nameInput.value || "",
               email: emailInput.value || "",
-              notes: notesInput.value || ""
+              notes: notesInput.value || "",
+              street: streetInput.value || "",
+              state: stateSelect.value || "",
+              zip: zipInput.value || ""
             }
           };
           localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
@@ -411,6 +487,9 @@
             if (data.form.name) nameInput.value = data.form.name;
             if (data.form.email) emailInput.value = data.form.email;
             if (data.form.notes) notesInput.value = data.form.notes;
+            if (data.form.street) streetInput.value = data.form.street;
+            if (data.form.state) stateSelect.value = data.form.state;
+            if (data.form.zip) zipInput.value = data.form.zip;
           }
         } catch (_) {
           // ignore
@@ -420,6 +499,9 @@
       nameInput.addEventListener("input", persistState);
       emailInput.addEventListener("input", persistState);
       notesInput.addEventListener("input", persistState);
+      streetInput.addEventListener("input", persistState);
+      stateSelect.addEventListener("change", persistState);
+      zipInput.addEventListener("input", persistState);
 
       // ---------- Fetch designs ----------
       fetch("designs.json")
