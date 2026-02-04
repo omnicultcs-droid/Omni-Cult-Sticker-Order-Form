@@ -24,23 +24,39 @@
       text-align: center;
     }
 
+    .logo-wrapper {
+      margin-top: 8px;
+      margin-bottom: 8px;
+    }
+
     .logo {
+      max-width: 520px;
       width: 100%;
-      max-width: 600px;   /* medium size */
-      margin: 4px auto 8px auto;
+      height: auto;
       display: block;
+      margin: 0 auto;
+    }
+
+    .logo-caption {
+      margin-top: 4px;
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #9ca3af;
     }
 
     h1 {
-      margin: 0 0 6px;
-      font-size: 2rem;
-      font-weight: 700;
+      margin: 10px 0 4px;
+      font-size: 1.9rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
     }
 
     header p {
       margin: 0;
-      font-size: 1rem;
-      font-weight: 600;
+      font-size: 0.95rem;
+      font-weight: 500;
       color: #cbd5e1;
     }
 
@@ -194,19 +210,21 @@
       display: inline-block;
     }
 
+    /* Buttons – unified Omni-Cult green accent */
     .submit-btn {
       margin-top: 14px;
       padding: 12px 18px;
       border-radius: 999px;
-      border: none;
-      background: linear-gradient(135deg, #22c55e, #16a34a);
+      border: 1px solid #22c55e;
+      background: #22c55e;
       color: #020617;
-      font-weight: 700;
+      font-weight: 800;
       cursor: pointer;
       font-size: 1rem;
       width: 100%;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
     }
-
     .submit-btn:hover { filter: brightness(1.07); }
 
     .load-more-wrap {
@@ -236,9 +254,7 @@
       cursor: pointer;
       white-space: nowrap;
     }
-    .clear-all-btn:hover {
-      background: #7c2d12;
-    }
+    .clear-all-btn:hover { background: #7c2d12; }
 
     .status {
       margin-top: 6px;
@@ -247,8 +263,20 @@
     .status.error { color: #fecaca; }
 
     .small-note { font-size: 0.75rem; color: #9ca3af; }
-    .disclaimer { font-size: 0.75rem; color: #6b7280; margin-top: 4px; text-align: right; }
 
+    .disclaimer {
+      font-size: 0.75rem;
+      color: #6b7280;
+      margin-top: 6px;
+      text-align: right;
+    }
+
+    .selection-summary {
+      margin-top: 4px;
+      font-size: 0.8rem;
+      text-align: right;
+      color: #e5e7eb;
+    }
   </style>
 </head>
 
@@ -256,7 +284,11 @@
   <div class="page">
 
     <header>
-      <img src="img/logo.png" alt="Omni-Cult logo" class="logo">
+      <div class="logo-wrapper">
+        <!-- logo.png lives next to index.html -->
+        <img src="logo.png" alt="Omni-Cult logo" class="logo">
+        <div class="logo-caption">Sticker order form</div>
+      </div>
       <h1>Sticker Order Form</h1>
       <p>Select stickers, tick the box, and choose quantities (0–99). Colors may vary; pink line = sticker shape.</p>
     </header>
@@ -281,7 +313,7 @@
       />
       <!-- list of chosen items -->
       <input type="hidden" name="items" id="itemsField" />
-      <!-- CC the customer on free plan -->
+      <!-- CC the customer (Formspree may ignore this on free plan, but it's safe) -->
       <input type="hidden" name="_cc" id="ccField" />
 
       <div class="order-grid">
@@ -319,6 +351,7 @@
       </div>
 
       <p class="disclaimer">colors may vary; pink line = cutline.</p>
+      <p id="selectionSummary" class="selection-summary">Total selected: 0 stickers</p>
 
       <button type="submit" class="submit-btn">Submit order</button>
       <div id="formStatus" class="status"></div>
@@ -342,6 +375,7 @@
       const nameInput = orderForm.querySelector('input[name="name"]');
       const notesInput = orderForm.querySelector('textarea[name="notes"]');
       const ccField = document.getElementById("ccField");
+      const selectionSummary = document.getElementById("selectionSummary");
 
       let all = [];        // all designs
       let filtered = [];   // filtered designs
@@ -422,6 +456,7 @@
           loadMoreBtn.style.display = filtered.length ? "inline-block" : "none";
         }
         renderMore();
+        updateSelectionSummary();
       }
 
       function renderMore() {
@@ -506,7 +541,14 @@
           formStatus.classList.remove("error");
         }
 
+        updateSelectionSummary();
         persistState();
+      }
+
+      function updateSelectionSummary() {
+        const total = Object.values(selections).reduce((sum, n) => sum + (parseInt(n, 10) || 0), 0);
+        selectionSummary.textContent =
+          "Total selected: " + total + " sticker" + (total === 1 ? "" : "s");
       }
 
       function padGrid() {
@@ -556,7 +598,6 @@
 
         selections = {};
         persistState();
-        // re-render everything with cleared selections
         resetAndRender();
       });
 
@@ -579,7 +620,7 @@
 
         itemsField.value = lines.join("\n");
 
-        // CC the customer so they get a copy
+        // Try to CC the customer so they get a copy of the order
         ccField.value = (emailInput.value || "").trim();
 
         persistState();
