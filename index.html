@@ -37,6 +37,14 @@
       margin: 0 auto;
     }
 
+    .logo-caption {
+      margin-top: 4px;
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #9ca3af;
+    }
+
     h1 {
       margin: 10px 0 4px;
       font-size: 1.9rem;
@@ -65,22 +73,9 @@
       .order-grid { grid-template-columns: repeat(2, 1fr); }
     }
 
-    /* Address grid: street, state, zip */
-    .address-grid {
-      display: grid;
-      gap: 10px;
-      margin-top: 10px;
-    }
-    @media (min-width: 720px) {
-      .address-grid {
-        grid-template-columns: 2fr 1fr 1fr;
-      }
-    }
-
     input[type="text"],
     input[type="email"],
-    textarea,
-    select {
+    textarea {
       width: 100%;
       padding: 8px 9px;
       border-radius: 6px;
@@ -103,7 +98,13 @@
       color: #d1d5db;
     }
     .search-row input {
+      width: 100%;
       padding: 7px 9px;
+      border-radius: 6px;
+      border: 1px solid #374151;
+      background: #020617;
+      color: #f9fafb;
+      font-size: 0.9rem;
     }
 
     .toolbar {
@@ -144,7 +145,7 @@
 
     .design-card.selected {
       border-color: #22c55e;
-      box-shadow: 0 0 10px rgba(163, 230, 53, 0.7);
+      box-shadow: 0 0 6px rgba(34,197,94,0.5);
     }
 
     .design-card.placeholder {
@@ -180,12 +181,53 @@
       align-items: center;
       margin-top: 4px;
       font-size: 0.7rem;
+      gap: 6px;
     }
 
+    /* Make checkbox + label a bit larger */
+    .design-controls label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .design-controls input[type="checkbox"] {
+      transform: scale(1.15);
+    }
+
+    .qty-group {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Slightly larger select to match plus/minus */
     .design-controls select {
-      width: 62px;
-      padding: 3px 5px;
-      font-size: 0.7rem;
+      padding: 4px 6px;
+      font-size: 0.8rem;
+      background: #020617;
+      color: #f9fafb;
+      border-radius: 6px;
+      border: 1px solid #374151;
+    }
+
+    .qty-btn {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      border: 1px solid #22c55e;
+      background: #22c55e;
+      color: #020617;
+      font-size: 0.9rem;
+      font-weight: 800;
+      line-height: 1;
+      padding: 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .qty-btn:hover {
+      filter: brightness(1.07);
     }
 
     .remove-btn {
@@ -193,9 +235,9 @@
       align-self: flex-end;
       padding: 3px 8px;
       border-radius: 999px;
-      border: 1px solid #f472b6;
+      border: 1px solid #4b5563;
       background: #111827;
-      color: #f9fafb;
+      color: #e5e7eb;
       font-size: 0.65rem;
       cursor: pointer;
       display: none;
@@ -205,13 +247,13 @@
       display: inline-block;
     }
 
-    /* Buttons – match logo neon green + magenta */
+    /* Buttons – unified Omni-Cult green accent for primary actions */
     .submit-btn {
-      margin-top: 14px;
+      margin-top: 16px;
       padding: 12px 18px;
       border-radius: 999px;
-      border: 1px solid #f472b6;
-      background: linear-gradient(135deg, #a3e635, #22c55e);
+      border: 1px solid #22c55e;
+      background: #22c55e;
       color: #020617;
       font-weight: 800;
       cursor: pointer;
@@ -219,12 +261,8 @@
       width: 100%;
       letter-spacing: 0.04em;
       text-transform: uppercase;
-      box-shadow: 0 0 14px rgba(244, 114, 182, 0.45);
     }
-    .submit-btn:hover {
-      filter: brightness(1.08);
-      box-shadow: 0 0 18px rgba(244, 114, 182, 0.7);
-    }
+    .submit-btn:hover { filter: brightness(1.07); }
 
     .load-more-wrap {
       text-align: center;
@@ -237,30 +275,29 @@
       border: 1px solid #22c55e;
       background: #0b1120;
       font-weight: 700;
-      color: #a3e635;
+      color: #22c55e;
       cursor: pointer;
       font-size: 0.95rem;
-      box-shadow: 0 0 10px rgba(34, 197, 94, 0.4);
     }
     .load-more-btn:hover { background: #111827; }
 
     .clear-all-btn {
       padding: 6px 14px;
       border-radius: 999px;
-      border: 1px solid #f472b6;
+      border: 1px solid #f97316;
       background: #111827;
-      color: #fed7f2;
+      color: #fed7aa;
       font-size: 0.75rem;
       cursor: pointer;
       white-space: nowrap;
     }
     .clear-all-btn:hover {
-      background: #1f2937;
+      background: #7c2d12;
     }
 
     .status {
       margin-top: 6px;
-      font-size: 0.75rem;
+      font-size: 0.8rem;
     }
     .status.error { color: #fecaca; }
 
@@ -274,10 +311,13 @@
     }
 
     .selection-summary {
-      margin-top: 4px;
-      font-size: 0.8rem;
+      margin-top: 6px;
+      font-size: 1.05rem;
+      font-weight: 800;
       text-align: right;
-      color: #e5e7eb;
+      color: #22c55e;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
     }
   </style>
 </head>
@@ -289,6 +329,7 @@
       <div class="logo-wrapper">
         <!-- logo.png lives next to index.html -->
         <img src="logo.png" alt="Omni-Cult logo" class="logo">
+        <div class="logo-caption">Sticker order form</div>
       </div>
       <h1>Sticker Order Form</h1>
       <p>Select stickers, tick the box, and choose quantities (0–99). Colors may vary; pink line = sticker shape.</p>
@@ -314,10 +355,9 @@
       />
       <!-- list of chosen items -->
       <input type="hidden" name="items" id="itemsField" />
-      <!-- CC the customer (may be ignored on free tier, but harmless) -->
+      <!-- CC the customer (Formspree may ignore this on free plan, but it's safe) -->
       <input type="hidden" name="_cc" id="ccField" />
 
-      <!-- Name + email -->
       <div class="order-grid">
         <div>
           <label>Name</label>
@@ -326,74 +366,6 @@
         <div>
           <label>Email</label>
           <input name="email" type="email" required autocomplete="email">
-        </div>
-      </div>
-
-      <!-- Address (optional) -->
-      <div class="address-grid">
-        <div>
-          <label>Street address (optional)</label>
-          <input name="street" type="text" autocomplete="street-address">
-        </div>
-        <div>
-          <label>State (optional)</label>
-          <select name="state" id="stateSelect">
-            <option value="">Select state</option>
-            <option value="AL">Alabama</option>
-            <option value="AK">Alaska</option>
-            <option value="AZ">Arizona</option>
-            <option value="AR">Arkansas</option>
-            <option value="CA">California</option>
-            <option value="CO">Colorado</option>
-            <option value="CT">Connecticut</option>
-            <option value="DE">Delaware</option>
-            <option value="FL">Florida</option>
-            <option value="GA">Georgia</option>
-            <option value="HI">Hawaii</option>
-            <option value="ID">Idaho</option>
-            <option value="IL">Illinois</option>
-            <option value="IN">Indiana</option>
-            <option value="IA">Iowa</option>
-            <option value="KS">Kansas</option>
-            <option value="KY">Kentucky</option>
-            <option value="LA">Louisiana</option>
-            <option value="ME">Maine</option>
-            <option value="MD">Maryland</option>
-            <option value="MA">Massachusetts</option>
-            <option value="MI">Michigan</option>
-            <option value="MN">Minnesota</option>
-            <option value="MS">Mississippi</option>
-            <option value="MO">Missouri</option>
-            <option value="MT">Montana</option>
-            <option value="NE">Nebraska</option>
-            <option value="NV">Nevada</option>
-            <option value="NH">New Hampshire</option>
-            <option value="NJ">New Jersey</option>
-            <option value="NM">New Mexico</option>
-            <option value="NY">New York</option>
-            <option value="NC">North Carolina</option>
-            <option value="ND">North Dakota</option>
-            <option value="OH">Ohio</option>
-            <option value="OK">Oklahoma</option>
-            <option value="OR">Oregon</option>
-            <option value="PA">Pennsylvania</option>
-            <option value="RI">Rhode Island</option>
-            <option value="SC">South Carolina</option>
-            <option value="SD">South Dakota</option>
-            <option value="TN">Tennessee</option>
-            <option value="TX">Texas</option>
-            <option value="UT">Utah</option>
-            <option value="VT">Vermont</option>
-            <option value="VA">Virginia</option>
-            <option value="WA">Washington</option>
-            <option value="WV">West Virginia</option>
-            <option value="WI">Wisconsin</option>
-            <option value="WY">Wyoming</option>
-          </select>
-        </div>
-        <div>
-          <label>Zip code (optional)</label>
-          <input name="zip" type="text" inputmode="numeric" autocomplete="postal-code">
         </div>
       </div>
 
@@ -432,6 +404,7 @@
     document.addEventListener("DOMContentLoaded", () => {
       const PAGE_SIZE = 120;
       const STORAGE_KEY = "omnicult_sticker_order";
+      const MIN_TOTAL = 200;
 
       const gallery = document.getElementById("gallery");
       const loadMoreBtn = document.getElementById("loadMoreBtn");
@@ -444,9 +417,6 @@
       const emailInput = orderForm.querySelector('input[name="email"]');
       const nameInput = orderForm.querySelector('input[name="name"]');
       const notesInput = orderForm.querySelector('textarea[name="notes"]');
-      const streetInput = orderForm.querySelector('input[name="street"]');
-      const stateSelect = orderForm.querySelector('select[name="state"]');
-      const zipInput = orderForm.querySelector('input[name="zip"]');
       const ccField = document.getElementById("ccField");
       const selectionSummary = document.getElementById("selectionSummary");
 
@@ -465,10 +435,7 @@
             form: {
               name: nameInput.value || "",
               email: emailInput.value || "",
-              notes: notesInput.value || "",
-              street: streetInput.value || "",
-              state: stateSelect.value || "",
-              zip: zipInput.value || ""
+              notes: notesInput.value || ""
             }
           };
           localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
@@ -487,9 +454,6 @@
             if (data.form.name) nameInput.value = data.form.name;
             if (data.form.email) emailInput.value = data.form.email;
             if (data.form.notes) notesInput.value = data.form.notes;
-            if (data.form.street) streetInput.value = data.form.street;
-            if (data.form.state) stateSelect.value = data.form.state;
-            if (data.form.zip) zipInput.value = data.form.zip;
           }
         } catch (_) {
           // ignore
@@ -499,9 +463,6 @@
       nameInput.addEventListener("input", persistState);
       emailInput.addEventListener("input", persistState);
       notesInput.addEventListener("input", persistState);
-      streetInput.addEventListener("input", persistState);
-      stateSelect.addEventListener("change", persistState);
-      zipInput.addEventListener("input", persistState);
 
       // ---------- Fetch designs ----------
       fetch("designs.json")
@@ -566,18 +527,24 @@
               <input type="checkbox" class="sel-toggle" data-key="${key}">
               Select
             </label>
-            <label>
-              Qty
-              <select class="qty-select" data-key="${key}">
-                ${Array.from({length: 100}, (_, x) => `<option value="${x}">${x}</option>`).join("")}
-              </select>
-            </label>
+            <div>
+              <span>Qty</span>
+              <div class="qty-group">
+                <button type="button" class="qty-btn qty-minus" data-key="${key}">−</button>
+                <select class="qty-select" data-key="${key}">
+                  ${Array.from({length: 100}, (_, x) => `<option value="${x}">${x}</option>`).join("")}
+                </select>
+                <button type="button" class="qty-btn qty-plus" data-key="${key}">+</button>
+              </div>
+            </div>
           </div>
           <button type="button" class="remove-btn" data-key="${key}">Remove</button>
         `;
 
         const checkbox = card.querySelector(".sel-toggle");
         const qty = card.querySelector(".qty-select");
+        const minusBtn = card.querySelector(".qty-minus");
+        const plusBtn = card.querySelector(".qty-plus");
         const removeBtn = card.querySelector(".remove-btn");
 
         // Apply saved selection if any
@@ -597,6 +564,24 @@
           const n = parseInt(qty.value, 10) || 0;
           checkbox.checked = n > 0;
           updateSelection(key, n, checkbox.checked, card);
+        });
+
+        minusBtn.addEventListener("click", () => {
+          let n = parseInt(qty.value, 10) || 0;
+          if (n > 0) n -= 1;
+          qty.value = String(n);
+          const isChecked = n > 0;
+          checkbox.checked = isChecked;
+          updateSelection(key, n, isChecked, card);
+        });
+
+        plusBtn.addEventListener("click", () => {
+          let n = parseInt(qty.value, 10) || 0;
+          if (n < 99) n += 1;
+          qty.value = String(n);
+          const isChecked = n > 0;
+          checkbox.checked = isChecked;
+          updateSelection(key, n, isChecked, card);
         });
 
         removeBtn.addEventListener("click", () => {
@@ -628,9 +613,13 @@
       }
 
       function updateSelectionSummary() {
-        const total = Object.values(selections).reduce((sum, n) => sum + (parseInt(n, 10) || 0), 0);
+        const total = Object.values(selections).reduce(
+          (sum, n) => sum + (parseInt(n, 10) || 0),
+          0
+        );
         selectionSummary.textContent =
           "Total selected: " + total + " sticker" + (total === 1 ? "" : "s");
+        return total;
       }
 
       function padGrid() {
@@ -689,6 +678,18 @@
         if (!entries.length) {
           e.preventDefault();
           formStatus.textContent = "Select at least one sticker before submitting.";
+          formStatus.classList.add("error");
+          return;
+        }
+
+        const total = updateSelectionSummary();
+        if (total < MIN_TOTAL) {
+          e.preventDefault();
+          const message =
+            "A minimum of " + MIN_TOTAL + " stickers is required to proceed. " +
+            "You currently have " + total + ".";
+          alert(message);
+          formStatus.textContent = message;
           formStatus.classList.add("error");
           return;
         }
