@@ -50,7 +50,9 @@
       .order-grid { grid-template-columns: repeat(2, 1fr); }
     }
 
-    input[type="text"], input[type="email"], textarea {
+    input[type="text"],
+    input[type="email"],
+    textarea {
       width: 100%;
       padding: 8px 9px;
       border-radius: 6px;
@@ -64,7 +66,7 @@
 
     .search-row {
       margin-top: 14px;
-      margin-bottom: 8px;
+      margin-bottom: 4px;
     }
     .search-row label {
       display: block;
@@ -82,34 +84,18 @@
       font-size: 0.9rem;
     }
 
-    /* Selection summary + clear-all */
-    .selection-bar {
+    .toolbar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-top: 8px;
+      gap: 8px;
+      margin-top: 6px;
+      margin-bottom: 4px;
       font-size: 0.8rem;
       color: #9ca3af;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .selection-summary {
-      font-size: 0.8rem;
-    }
-    .clear-btn {
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid #ef4444;
-      background: transparent;
-      color: #fecaca;
-      font-size: 0.75rem;
-      cursor: pointer;
-    }
-    .clear-btn:hover {
-      background: #111827;
     }
 
-    /* Gallery grid */
+    /* FIXED EVEN GRID */
     .gallery {
       display: grid;
       gap: 12px;
@@ -184,24 +170,21 @@
       border: 1px solid #374151;
     }
 
-    /* Per-card remove button */
-    .design-footer {
-      margin-top: 6px;
-      display: flex;
-      justify-content: flex-end;
-    }
     .remove-btn {
-      padding: 4px 8px;
+      margin-top: 4px;
+      align-self: flex-end;
+      padding: 3px 8px;
       border-radius: 999px;
       border: 1px solid #4b5563;
-      background: transparent;
-      color: #9ca3af;
-      font-size: 0.7rem;
+      background: #111827;
+      color: #e5e7eb;
+      font-size: 0.65rem;
       cursor: pointer;
+      display: none;
     }
-    .remove-btn:hover {
-      border-color: #ef4444;
-      color: #fecaca;
+
+    .design-card.selected .remove-btn {
+      display: inline-block;
     }
 
     .submit-btn {
@@ -236,6 +219,20 @@
     }
     .load-more-btn:hover { background: #111827; }
 
+    .clear-all-btn {
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: 1px solid #f97316;
+      background: #111827;
+      color: #fed7aa;
+      font-size: 0.75rem;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .clear-all-btn:hover {
+      background: #7c2d12;
+    }
+
     .status {
       margin-top: 6px;
       font-size: 0.75rem;
@@ -244,6 +241,7 @@
 
     .small-note { font-size: 0.75rem; color: #9ca3af; }
     .disclaimer { font-size: 0.75rem; color: #6b7280; margin-top: 4px; text-align: right; }
+
   </style>
 </head>
 
@@ -261,24 +259,31 @@
       method="POST"
       action="https://formspree.io/f/mykdggqy"
     >
-      <!-- redirect back to success page after a good submit -->
+      <!-- redirect back to success page after submit -->
       <input
         type="hidden"
         name="_redirect"
         value="https://omnicultcs-droid.github.io/Omni-Cult-Sticker-Order-Form/success.html"
       />
-      <!-- Clean list of selections goes here -->
-      <input type="hidden" name="items" id="itemsField">
+      <!-- subject line in your inbox -->
+      <input
+        type="hidden"
+        name="_subject"
+        value="New Omni-Cult sticker order"
+      />
+      <!-- list of chosen items -->
+      <input type="hidden" name="items" id="itemsField" />
+      <!-- CC the customer on free plan -->
+      <input type="hidden" name="_cc" id="ccField" />
 
       <div class="order-grid">
         <div>
           <label>Name</label>
-          <input name="name" type="text" required>
+          <input name="name" type="text" required autocomplete="name">
         </div>
         <div>
           <label>Email</label>
-          <!-- This 'email' field is what Formspree uses for reply-to and autoresponse -->
-          <input name="email" type="email" required>
+          <input name="email" type="email" required autocomplete="email">
         </div>
       </div>
 
@@ -292,11 +297,9 @@
         <input id="searchInput" type="search" placeholder="Type to filter… e.g. germs, skull, anime" />
       </div>
 
-      <div class="selection-bar">
-        <div id="selectionSummary" class="selection-summary">
-          No stickers selected yet.
-        </div>
-        <button type="button" id="clearSelectionsBtn" class="clear-btn">
+      <div class="toolbar">
+        <span id="galleryStatus" class="small-note"></span>
+        <button type="button" id="clearAllBtn" class="clear-all-btn">
           Remove all selections
         </button>
       </div>
@@ -306,8 +309,6 @@
       <div class="load-more-wrap">
         <button type="button" id="loadMoreBtn" class="load-more-btn">LOAD MORE</button>
       </div>
-
-      <p id="galleryStatus" class="small-note"></p>
 
       <p class="disclaimer">colors may vary; pink line = cutline.</p>
 
@@ -319,175 +320,185 @@
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       const PAGE_SIZE = 120;
-      const STORAGE_KEY = "omniCultStickerSelections_v1";
+      const STORAGE_KEY = "omnicult_sticker_order";
 
       const gallery = document.getElementById("gallery");
       const loadMoreBtn = document.getElementById("loadMoreBtn");
       const searchInput = document.getElementById("searchInput");
       const itemsField = document.getElementById("itemsField");
       const formStatus = document.getElementById("formStatus");
-      const selectionSummary = document.getElementById("selectionSummary");
-      const clearSelectionsBtn = document.getElementById("clearSelectionsBtn");
+      const galleryStatus = document.getElementById("galleryStatus");
+      const clearAllBtn = document.getElementById("clearAllBtn");
+      const orderForm = document.getElementById("orderForm");
+      const emailInput = orderForm.querySelector('input[name="email"]');
+      const nameInput = orderForm.querySelector('input[name="name"]');
+      const notesInput = orderForm.querySelector('textarea[name="notes"]');
+      const ccField = document.getElementById("ccField");
 
-      let all = [];
-      let filtered = [];
-      let count = 0;
-      let selections = loadSelections();
+      let all = [];        // all designs
+      let filtered = [];   // filtered designs
+      let count = 0;       // how many currently rendered
+      let selections = {}; // { key: qty }
 
-      // Load from localStorage
-      function loadSelections() {
+      loadMoreBtn.style.display = "none";
+
+      // ---------- Local storage helpers ----------
+      function persistState() {
         try {
-          const raw = localStorage.getItem(STORAGE_KEY);
-          if (!raw) return {};
-          const obj = JSON.parse(raw);
-          if (!obj || typeof obj !== "object") return {};
-          const cleaned = {};
-          Object.keys(obj).forEach(k => {
-            const n = parseInt(obj[k], 10);
-            if (!isNaN(n) && n > 0) {
-              cleaned[String(k)] = n;
+          const payload = {
+            selections,
+            form: {
+              name: nameInput.value || "",
+              email: emailInput.value || "",
+              notes: notesInput.value || ""
             }
-          });
-          return cleaned;
-        } catch (e) {
-          return {};
-        }
-      }
-
-      function saveSelections() {
-        try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(selections));
-        } catch (e) {
+          };
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+        } catch (_) {
           // ignore storage errors
         }
-        updateSelectionSummary();
       }
 
-      function updateSelectionSummary() {
-        const keys = Object.keys(selections);
-        if (!keys.length) {
-          selectionSummary.textContent = "No stickers selected yet.";
-          return;
+      function loadState() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return;
+          const data = JSON.parse(raw);
+          if (data && data.selections) selections = data.selections || {};
+          if (data && data.form) {
+            if (data.form.name) nameInput.value = data.form.name;
+            if (data.form.email) emailInput.value = data.form.email;
+            if (data.form.notes) notesInput.value = data.form.notes;
+          }
+        } catch (_) {
+          // ignore
         }
-        let totalQty = 0;
-        keys.forEach(k => {
-          const n = parseInt(selections[k], 10) || 0;
-          totalQty += n;
-        });
-        const countDesigns = keys.length;
-        selectionSummary.textContent =
-          `Selected: ${countDesigns} design${countDesigns !== 1 ? "s" : ""}, ` +
-          `${totalQty} sticker${totalQty !== 1 ? "s" : ""} total.`;
       }
 
-      // Initial summary based on whatever is in localStorage
-      updateSelectionSummary();
+      nameInput.addEventListener("input", persistState);
+      emailInput.addEventListener("input", persistState);
+      notesInput.addEventListener("input", persistState);
 
-      // Load designs.json and normalize names for fuzzy-ish search
+      // ---------- Fetch designs ----------
       fetch("designs.json")
         .then(r => r.json())
         .then(data => {
           all = data.map((d, i) => {
             const raw = d.img || d.image || d.src || d.file || "";
             const base = raw.substring(raw.lastIndexOf("/") + 1).replace(/\.[^.]+$/, "");
-            const display = base;
-            const search = base.toLowerCase();
-            const norm = search.replace(/[^a-z0-9]+/g, "");
             const img = raw.includes("/") ? raw : "img/" + raw;
-            return { key: i, display, search, norm, img };
+            return {
+              key: String(i),
+              name: base.toLowerCase(),
+              display: base,
+              img
+            };
           });
+
           all.sort((a, b) => a.display.localeCompare(b.display));
+
+          // Load saved selections & form values
+          loadState();
+
           filtered = all.slice();
-          renderMore();
-        })
-        .catch(err => {
-          console.error("Error loading designs.json", err);
-          formStatus.textContent = "Error loading sticker list.";
-          formStatus.classList.add("error");
+          resetAndRender();
         });
+
+      // ---------- Rendering ----------
+      function resetAndRender() {
+        gallery.innerHTML = "";
+        count = 0;
+        if (filtered.length > PAGE_SIZE) {
+          loadMoreBtn.style.display = "inline-block";
+        } else {
+          loadMoreBtn.style.display = filtered.length ? "inline-block" : "none";
+        }
+        renderMore();
+      }
 
       function renderMore() {
         const next = filtered.slice(count, count + PAGE_SIZE);
         next.forEach(addCard);
         count += next.length;
         padGrid();
-        if (count >= filtered.length) loadMoreBtn.style.display = "none";
+        updateGalleryStatus();
+        if (count >= filtered.length) {
+          loadMoreBtn.style.display = "none";
+        }
       }
 
       function addCard(design) {
         const card = document.createElement("div");
         card.className = "design-card";
 
+        const key = design.key;
+
         card.innerHTML = `
           <div class="thumb-wrapper"><img src="${design.img}" alt="${design.display}"></div>
           <div class="design-name">${design.display}</div>
           <div class="design-controls">
             <label>
-              <input
-                type="checkbox"
-                class="design-select"
-                data-key="${design.key}"
-              >
+              <input type="checkbox" class="sel-toggle" data-key="${key}">
               Select
             </label>
-            <label>Qty
-              <select class="design-qty" data-key="${design.key}">
-                ${Array.from({length:100},(_,x)=>`<option value="${x}">${x}</option>`).join("")}
+            <label>
+              Qty
+              <select class="qty-select" data-key="${key}">
+                ${Array.from({length: 100}, (_, x) => `<option value="${x}">${x}</option>`).join("")}
               </select>
             </label>
           </div>
-          <div class="design-footer">
-            <button type="button" class="remove-btn" data-key="${design.key}">
-              remove from order
-            </button>
-          </div>
+          <button type="button" class="remove-btn" data-key="${key}">Remove</button>
         `;
 
-        const checkbox = card.querySelector(".design-select");
-        const qty = card.querySelector(".design-qty");
+        const checkbox = card.querySelector(".sel-toggle");
+        const qty = card.querySelector(".qty-select");
         const removeBtn = card.querySelector(".remove-btn");
-        const keyStr = String(design.key);
 
-        // Restore previous selection state, if any
-        if (Object.prototype.hasOwnProperty.call(selections, keyStr)) {
-          const existingQty = selections[keyStr];
+        // Apply saved selection if any
+        const savedQty = selections[key];
+        if (savedQty && savedQty > 0) {
           checkbox.checked = true;
-          qty.value = String(existingQty);
+          qty.value = String(savedQty);
           card.classList.add("selected");
         }
 
         checkbox.addEventListener("change", () => {
           if (checkbox.checked && qty.value === "0") qty.value = "1";
-          updateSelection(keyStr, qty.value, checkbox.checked, card);
+          updateSelection(key, parseInt(qty.value, 10), checkbox.checked, card);
         });
 
         qty.addEventListener("change", () => {
-          checkbox.checked = qty.value !== "0";
-          updateSelection(keyStr, qty.value, checkbox.checked, card);
+          const n = parseInt(qty.value, 10) || 0;
+          checkbox.checked = n > 0;
+          updateSelection(key, n, checkbox.checked, card);
         });
 
         removeBtn.addEventListener("click", () => {
-          // remove just this sticker
-          delete selections[keyStr];
+          // just this sticker
           checkbox.checked = false;
           qty.value = "0";
-          card.classList.remove("selected");
-          saveSelections();
+          updateSelection(key, 0, false, card);
         });
 
         gallery.appendChild(card);
       }
 
-      function updateSelection(keyStr, qty, isChecked, card) {
-        const n = parseInt(qty, 10);
-        if (isChecked && n > 0) {
-          selections[keyStr] = n;
+      function updateSelection(key, qty, isChecked, card) {
+        if (isChecked && qty > 0) {
+          selections[key] = qty;
           card.classList.add("selected");
         } else {
-          delete selections[keyStr];
+          delete selections[key];
           card.classList.remove("selected");
         }
-        saveSelections();
+
+        if (Object.keys(selections).length > 0) {
+          formStatus.textContent = "";
+          formStatus.classList.remove("error");
+        }
+
+        persistState();
       }
 
       function padGrid() {
@@ -504,72 +515,67 @@
         }
       }
 
-      // Clear all selections with confirmation
-      clearSelectionsBtn.addEventListener("click", () => {
-        if (!Object.keys(selections).length) return;
-        const sure = window.confirm("Are you sure you want to remove all selections?");
-        if (!sure) return;
-
-        selections = {};
-        saveSelections();
-
-        // Reset visible UI
-        const cards = gallery.querySelectorAll(".design-card");
-        cards.forEach(card => {
-          card.classList.remove("selected");
-          const cb = card.querySelector(".design-select");
-          const q = card.querySelector(".design-qty");
-          if (cb) cb.checked = false;
-          if (q) q.value = "0";
-        });
-      });
-
-      // Vague, case-insensitive search (ignores punctuation, hyphens, etc.)
-      searchInput.addEventListener("input", () => {
-        const qRaw = searchInput.value.trim().toLowerCase();
-        const s = qRaw.replace(/[^a-z0-9]+/g, "");
-
-        gallery.innerHTML = "";
-        count = 0;
-
-        if (!s) {
-          // no search → show everything
-          filtered = all.slice();
+      function updateGalleryStatus() {
+        if (!filtered.length) {
+          galleryStatus.textContent = "No designs match that search.";
         } else {
-          // filter by loose match
-          filtered = all.filter(d => {
-            return d.search.includes(qRaw) || d.norm.includes(s);
-          });
+          galleryStatus.textContent =
+            "Showing " + Math.min(count, filtered.length) + " of " + filtered.length + " designs";
         }
+      }
 
-        // Do NOT delete selections here: they persist even if currently filtered out
-        loadMoreBtn.style.display = filtered.length > PAGE_SIZE ? "inline-block" : "none";
-        renderMore();
+      window.addEventListener("resize", padGrid);
+
+      // ---------- Search ----------
+      searchInput.addEventListener("input", () => {
+        const q = searchInput.value.toLowerCase().trim();
+        filtered = q
+          ? all.filter(d => d.name.includes(q))
+          : all.slice();
+
+        resetAndRender();
       });
 
+      // ---------- Load more ----------
       loadMoreBtn.addEventListener("click", renderMore);
 
-      document.getElementById("orderForm").addEventListener("submit", e => {
-        const items = Object.entries(selections)
-          .map(([k, v]) => {
-            const d = all.find(x => String(x.key) === k);
-            return d ? `${d.display} x ${v}` : "";
-          })
-          .filter(Boolean);
+      // ---------- Clear all selections ----------
+      clearAllBtn.addEventListener("click", () => {
+        if (!Object.keys(selections).length) return;
 
-        if (!items.length) {
+        const ok = window.confirm("Are you sure you want to remove all selected stickers?");
+        if (!ok) return;
+
+        selections = {};
+        persistState();
+        // re-render everything with cleared selections
+        resetAndRender();
+      });
+
+      // ---------- Submit ----------
+      orderForm.addEventListener("submit", e => {
+        const entries = Object.entries(selections);
+        if (!entries.length) {
           e.preventDefault();
-          formStatus.textContent = "Select at least one sticker.";
+          formStatus.textContent = "Select at least one sticker before submitting.";
           formStatus.classList.add("error");
           return;
         }
 
-        // Put clean list into the hidden field
-        itemsField.value = items.join("\n");
-        // We don't touch any of the visible inputs; no disabling required
-      });
+        const lines = [];
+        entries.forEach(([k, qty]) => {
+          const d = all.find(x => x.key === k);
+          if (!d) return;
+          lines.push(`${d.display} x ${qty}`);
+        });
 
-      window.addEventListener("resize", padGrid);
+        itemsField.value = lines.join("\n");
+
+        // CC the customer so they get a copy
+        ccField.value = (emailInput.value || "").trim();
+
+        persistState();
+      });
     });
   </script>
 
