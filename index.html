@@ -1066,36 +1066,83 @@
 
       /* ---------- SUBMIT (via fetch + redirect) ---------- */
       orderForm.addEventListener("submit", async e => {
-        e.preventDefault(); // prevent browser from going to plain "OK" page
+  e.preventDefault(); // prevent browser from going to plain "OK" page
 
-        const entries = Object.entries(selections);
-        if (!entries.length) {
-          formStatus.textContent = "Select at least one sticker before submitting.";
-          formStatus.classList.add("error");
-          return;
-        }
+  const entries = Object.entries(selections);
+  if (!entries.length) {
+    formStatus.textContent = "Select at least one sticker before submitting.";
+    formStatus.classList.add("error");
+    return;
+  }
 
-        const total = updateSelectionSummary();
-        if (total < MIN_TOTAL) {
-          const message =
-            "A minimum of " + MIN_TOTAL + " stickers is required to proceed. " +
-            "You currently have " + total + ".";
-          alert(message);
-          formStatus.textContent = message;
-          formStatus.classList.add("error");
-          return;
-        }
+  const total = updateSelectionSummary();
+  if (total < MIN_TOTAL) {
+    const message =
+      "A minimum of " + MIN_TOTAL + " stickers is required to proceed. " +
+      "You currently have " + total + ".";
+    alert(message);
+    formStatus.textContent = message;
+    formStatus.classList.add("error");
+    return;
+  }
 
-        const lines = [];
-        let totalQty = 0;
+  // Build items list + totals
+  const lines = [];
+  let totalQty = 0;
 
-        entries.forEach(([k, qty]) => {
-          const d = all.find(x => x.key === k);
-          if (!d) return;
-          const n = parseInt(qty, 10) || 0;
-          totalQty += n;
-          lines.push(`${d.display} x ${n}`);
-        });
+  entries.forEach(([k, qty]) => {
+    const d = all.find(x => x.key === k);
+    if (!d) return;
+    const n = parseInt(qty, 10) || 0;
+    totalQty += n;
+    lines.push(`${d.display} x ${n}`);
+  });
+
+  const unit = getUnitPrice(totalQty);
+  let estimatedLine = "";
+  if (unit) {
+    const estimatedTotal = (totalQty * unit).toFixed(2);
+    estimatedLine = "ESTIMATED TOTAL: $" + estimatedTotal + " USD (before tax & shipping)";
+  }
+
+  lines.push("");
+  lines.push("TOTAL STICKERS: " + totalQty);
+  if (estimatedLine) {
+    lines.push(estimatedLine);
+  }
+
+  itemsField.value = lines.join("\n");
+
+  // Save form state locally
+  persistState();
+
+  // Show submitting status
+  formStatus.textContent = "Submitting order...";
+  formStatus.classList.remove("error");
+
+  try {
+    const response = await fetch(orderForm.action, {
+      method: "POST",
+      body: new FormData(orderForm)
+    });
+
+    const text = await response.text();
+
+    // Apps Script returns plain "OK"
+    if (text.trim() === "OK") {
+      window.location.href = "success.html";
+    } else {
+      console.warn("Unexpected response from Apps Script:", text);
+      // Still send them to success page so they aren't stuck
+      window.location.href = "success.html";
+    }
+  } catch (err) {
+    console.error("Submit error:", err);
+    formStatus.textContent = "There was an error submitting your order. Please try again.";
+    formStatus.classList.add("error");
+  }
+});
+
 
         const unit = getUnitPrice(totalQty);
         let estimatedLine = "";
