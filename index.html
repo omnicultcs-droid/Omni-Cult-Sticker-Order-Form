@@ -339,17 +339,18 @@
       text-align: right;
     }
 
-    /* SUMMARY ROW: pricing table / calculator / total */
+    /* SUMMARY ROW: three even boxes */
     .summary-row {
       margin-top: 12px;
       display: flex;
       flex-wrap: wrap;
       gap: 12px;
-      align-items: flex-start;
+      align-items: stretch;
     }
 
     .summary-col {
       flex: 1 1 100%;
+      display: flex;
     }
 
     @media (min-width: 900px) {
@@ -358,11 +359,19 @@
       }
     }
 
-    .pricing-table {
+    .summary-panel {
       border: 1px solid #1f2937;
       border-radius: 10px;
       padding: 10px 12px;
       background: #020617;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      font-size: 0.8rem;
+    }
+
+    .pricing-table {
       font-size: 0.8rem;
     }
 
@@ -404,10 +413,6 @@
       font-size: 0.9rem;
       font-weight: 700;
       color: #e5e7eb;
-      padding: 10px 12px;
-      border-radius: 10px;
-      border: 1px solid #1f2937;
-      background: #020617;
       line-height: 1.4;
     }
 
@@ -423,19 +428,13 @@
     }
 
     .selection-summary {
-      margin-top: 0;
-      font-size: 1.05rem;
+      margin: 0;
+      font-size: 1rem;
       font-weight: 800;
-      text-align: right;
+      text-align: center;
       color: var(--oc-green);
       letter-spacing: 0.04em;
       text-transform: uppercase;
-    }
-
-    @media (max-width: 899px) {
-      .selection-summary {
-        text-align: left;
-      }
     }
 
   </style>
@@ -540,49 +539,55 @@
 
       <p class="disclaimer">colors may vary; pink line = cutline.</p>
 
-      <!-- SUMMARY ROW: pricing table / calculator / total -->
+      <!-- SUMMARY ROW: three equal boxes -->
       <div class="summary-row">
         <!-- Left: Pricing table -->
         <div class="summary-col">
-          <div class="pricing-table">
-            <h3>Wholesale Pricing (USD)</h3>
-            <table>
-              <thead>
-                <tr>
-                  <th>Qty Range</th>
-                  <th>Price / sticker</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr><td>200–499</td><td>$0.90</td></tr>
-                <tr><td>500–999</td><td>$0.80</td></tr>
-                <tr><td>1000–1999</td><td>$0.75</td></tr>
-                <tr><td>2000–2999</td><td>$0.70</td></tr>
-                <tr><td>3000–3999</td><td>$0.65</td></tr>
-                <tr><td>4000–4999</td><td>$0.60</td></tr>
-                <tr><td>5000+</td><td>$0.55</td></tr>
-              </tbody>
-            </table>
+          <div class="summary-panel">
+            <div class="pricing-table">
+              <h3>Wholesale Pricing (USD)</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Qty Range</th>
+                    <th>Price / sticker</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>200–499</td><td>$0.90</td></tr>
+                  <tr><td>500–999</td><td>$0.80</td></tr>
+                  <tr><td>1000–1999</td><td>$0.75</td></tr>
+                  <tr><td>2000–2999</td><td>$0.70</td></tr>
+                  <tr><td>3000–3999</td><td>$0.65</td></tr>
+                  <tr><td>4000–4999</td><td>$0.60</td></tr>
+                  <tr><td>5000+</td><td>$0.55</td></tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
 
         <!-- Middle: Live price calculator -->
         <div class="summary-col">
-          <div id="priceSummary" class="price-summary">
-            <div class="line-strong">Estimated total: –</div>
-            <div>Increase your selection to unlock wholesale pricing.</div>
-          </div>
-          <div class="tax-note">
-            Final invoice will include any applicable sales tax.
-            California orders without a valid reseller permit are taxable.
+          <div class="summary-panel">
+            <div id="priceSummary" class="price-summary">
+              <div class="line-strong">Estimated total: –</div>
+              <div>Increase your selection to unlock wholesale pricing.</div>
+            </div>
+            <div class="tax-note">
+              Final invoice will include any applicable sales tax and shipping fees.
+              Orders without a valid reseller permit are taxable.
+            </div>
           </div>
         </div>
 
-        <!-- Right: Total selected -->
+        <!-- Right: Total selected in a box -->
         <div class="summary-col">
-          <p id="selectionSummary" class="selection-summary">
-            Total selected: 0 stickers
-          </p>
+          <div class="summary-panel">
+            <p id="selectionSummary" class="selection-summary">
+              Total selected: 0 stickers
+            </p>
+          </div>
         </div>
       </div>
 
