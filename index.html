@@ -537,13 +537,10 @@
       method="POST"
       action="https://formspree.io/f/mykdggqy"
     >
-      <!-- Formspree helpers -->
+      <!-- Formspree redirect after submit (same as when it worked before) -->
       <input type="hidden" name="_redirect"
         value="https://omnicultcs-droid.github.io/Omni-Cult-Sticker-Order-Form/success.html" />
-      <input type="hidden" name="_subject" value="New Omni-Cult sticker order" />
-      <!-- Reply-to for Formspree -->
-      <input type="hidden" name="_replyto" id="replyToField" />
-      <!-- Sticker items + totals -->
+      <!-- Single field that contains the sticker list + totals -->
       <input type="hidden" name="items" id="itemsField" />
 
       <div class="order-grid">
@@ -702,7 +699,7 @@
       const postalInput = orderForm.querySelector('input[name="postal"]');
       const countryInput = orderForm.querySelector('input[name="country"]');
       const resellerInput = orderForm.querySelector('input[name="reseller_id"]');
-      const replyToField = document.getElementById("replyToField");
+
       const selectionSummary = document.getElementById("selectionSummary");
       const priceSummary = document.getElementById("priceSummary");
       const selectionList = document.getElementById("selectionList");
@@ -773,8 +770,8 @@
       }
 
       function getNextTierInfo(total) {
-        if (total < 200)  return { at: 200, price: 0.90 };
-        if (total < 500)  return { at: 500, price: 0.80 };
+        if (total < 200)  return { at: 200,  price: 0.90 };
+        if (total < 500)  return { at: 500,  price: 0.80 };
         if (total < 1000) return { at: 1000, price: 0.75 };
         if (total < 2000) return { at: 2000, price: 0.70 };
         if (total < 3000) return { at: 3000, price: 0.65 };
@@ -1103,7 +1100,6 @@
           lines.push(`${d.display} x ${n}`);
         });
 
-        // Calculate estimated total price using same tier logic
         const unit = getUnitPrice(totalQty);
         let estimatedLine = "";
         if (unit) {
@@ -1118,9 +1114,6 @@
         }
 
         itemsField.value = lines.join("\n");
-
-        // tell Formspree what to use as reply-to
-        replyToField.value = emailInput.value.trim();
 
         persistState();
       });
