@@ -1,59 +1,105 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Order Received</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <title>Order Submitted — Omni-Cult</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <style>
     body {
       margin: 0;
+      padding: 0;
       background: #05060a;
       color: #f9fafb;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       display: flex;
-      align-items: center;
       justify-content: center;
-      height: 100vh;
+      align-items: center;
+      min-height: 100vh;
       text-align: center;
-      padding: 20px;
     }
-    .box {
-      max-width: 420px;
+
+    .container {
+      max-width: 600px;
+      padding: 24px;
       background: #0b1120;
-      padding: 28px;
       border-radius: 12px;
       border: 1px solid #1f2937;
+      box-shadow: 0 0 12px rgba(34,197,94,0.25);
     }
+
+    .logo {
+      width: 360px;
+      max-width: 100%;
+      margin-bottom: 20px;
+      filter: drop-shadow(0 0 6px rgba(34,197,94,0.3));
+    }
+
     h1 {
-      margin-bottom: 10px;
+      text-transform: uppercase;
       font-size: 1.8rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+      letter-spacing: 0.05em;
       color: #22c55e;
+      text-shadow: 0 0 6px rgba(34,197,94,0.4);
     }
+
     p {
-      margin-top: 0;
-      color: #cbd5e1;
+      font-size: 1rem;
+      line-height: 1.5;
+      color: #d1d5db;
+      margin-bottom: 14px;
     }
-    a {
+
+    .small {
+      font-size: 0.8rem;
+      color: #9ca3af;
+      margin-top: 10px;
+    }
+
+    .home-btn {
       display: inline-block;
-      margin-top: 18px;
-      padding: 10px 18px;
-      border-radius: 999px;
-      background: #22c55e;
+      margin-top: 20px;
+      padding: 12px 24px;
+      background: linear-gradient(135deg, #22c55e, #16a34a);
       color: #020617;
-      font-weight: 700;
+      font-weight: 800;
+      border-radius: 999px;
       text-decoration: none;
+      box-shadow: 0 0 12px rgba(34,197,94,0.45);
+      transition: 0.15s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
-    a:hover {
+
+    .home-btn:hover {
       filter: brightness(1.1);
+      box-shadow: 0 0 16px rgba(34,197,94,0.6);
     }
+
   </style>
 </head>
 <body>
 
-  <div class="box">
-    <h1>Order Submitted!</h1>
-    <p>Your sticker order has been received. You will get a confirmation email shortly.</p>
-    <a href="index.html">Back to Form</a>
+  <div class="container">
+    <img src="logo.png" alt="Omni-Cult Logo" class="logo" />
+
+    <h1>Order Submitted</h1>
+
+    <p>Thank you! Your sticker order has been successfully submitted.</p>
+
+    <p>
+      A confirmation email has been sent to you.<br>
+      We will review your selections and respond with a final invoice
+      including shipping and any applicable tax.
+    </p>
+
+    <p class="small">
+      If you need to make changes or have questions, reply to the confirmation email anytime.
+    </p>
+
+    <a class="home-btn" href="index.html">Back to Order Form</a>
   </div>
 
 </body>
