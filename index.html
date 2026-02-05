@@ -66,6 +66,16 @@
       text-overflow: ellipsis;
     }
 
+    /* Option B: let the line wrap cleanly on smaller screens */
+    @media (max-width: 640px) {
+      .instruction-line {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+        line-height: 1.4;
+      }
+    }
+
     .card {
       background: #0b1120;
       border-radius: 10px;
@@ -1064,9 +1074,9 @@
         resetAndRender();
       });
 
-      /* ---------- SUBMIT (real POST to Apps Script) ---------- */
-      orderForm.addEventListener("submit", e => {
-        e.preventDefault(); // we validate first, then do a real submit
+      /* ---------- SUBMIT (via fetch + redirect to success.html) ---------- */
+      orderForm.addEventListener("submit", async e => {
+        e.preventDefault(); // prevent normal navigation; we manage it
 
         const entries = Object.entries(selections);
         if (!entries.length) {
@@ -1117,8 +1127,20 @@
         formStatus.textContent = "Submitting order...";
         formStatus.classList.remove("error");
 
-        // 🔑 Let the browser POST to Apps Script and show the HTML from doPost()
-        orderForm.submit();
+        try {
+          // Fire-and-forget POST to Apps Script (no-cors avoids CORS errors)
+          await fetch(orderForm.action, {
+            method: "POST",
+            mode: "no-cors",
+            body: new FormData(orderForm)
+          });
+        } catch (err) {
+          console.error("Error submitting to Apps Script:", err);
+          // Optional: show an error, but we'll still send user to success page
+        }
+
+        // Redirect to your clean, banner-free success page
+        window.location.href = "success.html";
       });
     });
   </script>
