@@ -369,6 +369,7 @@
       flex-direction: column;
       justify-content: space-between;
       font-size: 0.8rem;
+      min-height: 140px;
     }
 
     .pricing-table {
@@ -428,13 +429,90 @@
     }
 
     .selection-summary {
-      margin: 0;
+      margin: 0 0 6px;
       font-size: 1rem;
       font-weight: 800;
       text-align: center;
       color: var(--oc-green);
       letter-spacing: 0.04em;
       text-transform: uppercase;
+    }
+
+    /* Mini-cart list under Total selected */
+    .selection-list {
+      flex: 1;
+      border-top: 1px solid #1f2937;
+      padding-top: 6px;
+      margin-top: 4px;
+      max-height: 140px;
+      overflow-y: auto;
+      font-size: 0.78rem;
+    }
+
+    .selection-list-empty {
+      color: #6b7280;
+      font-size: 0.78rem;
+      text-align: center;
+      margin-top: 6px;
+    }
+
+    .selection-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 0;
+      border-bottom: 1px dashed #1f2937;
+    }
+
+    .selection-row:last-child {
+      border-bottom: none;
+    }
+
+    .selection-name {
+      flex: 1 1 auto;
+      color: #e5e7eb;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .selection-controls {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .selection-qty {
+      min-width: 20px;
+      text-align: center;
+      font-weight: 600;
+      color: var(--oc-green);
+    }
+
+    .mini-btn {
+      border-radius: 999px;
+      border: 1px solid #374151;
+      background: #020617;
+      color: #e5e7eb;
+      font-size: 0.75rem;
+      padding: 2px 6px;
+      cursor: pointer;
+    }
+
+    .mini-btn.green {
+      border: none;
+      background: linear-gradient(135deg, var(--oc-green), var(--oc-green2));
+      color: #020617;
+      font-weight: 700;
+    }
+
+    .mini-btn.pink {
+      border: none;
+      background: linear-gradient(135deg, var(--oc-pink), var(--oc-pink2));
+      color: #020617;
+      font-weight: 700;
     }
 
   </style>
@@ -581,12 +659,15 @@
           </div>
         </div>
 
-        <!-- Right: Total selected in a box -->
+        <!-- Right: Total selected + scrollable list -->
         <div class="summary-col">
           <div class="summary-panel">
             <p id="selectionSummary" class="selection-summary">
               Total selected: 0 stickers
             </p>
+            <div id="selectionList" class="selection-list">
+              <div class="selection-list-empty">No stickers selected yet.</div>
+            </div>
           </div>
         </div>
       </div>
@@ -623,6 +704,7 @@
       const ccField = document.getElementById("ccField");
       const selectionSummary = document.getElementById("selectionSummary");
       const priceSummary = document.getElementById("priceSummary");
+      const selectionList = document.getElementById("selectionList");
 
       let all = [];
       let filtered = [];
@@ -735,6 +817,75 @@
         priceSummary.innerHTML = html;
       }
 
+      /* ---------- MINI-CART REBUILD ---------- */
+      function rebuildSelectionList() {
+        selectionList.innerHTML = "";
+
+        const entries = Object.entries(selections);
+        if (!entries.length) {
+          const empty = document.createElement("div");
+          empty.className = "selection-list-empty";
+          empty.textContent = "No stickers selected yet.";
+          selectionList.appendChild(empty);
+          return;
+        }
+
+        entries.forEach(([key, qty]) => {
+          const design = all.find(d => d.key === key);
+          if (!design) return;
+
+          const row = document.createElement("div");
+          row.className = "selection-row";
+          row.dataset.key = key;
+
+          row.innerHTML = `
+            <div class="selection-name" title="${design.display}">${design.display}</div>
+            <div class="selection-controls">
+              <button type="button" class="mini-btn green mini-minus">−</button>
+              <span class="selection-qty">${qty}</span>
+              <button type="button" class="mini-btn green mini-plus">+</button>
+              <button type="button" class="mini-btn pink mini-remove">x</button>
+            </div>
+          `;
+
+          const minusBtn = row.querySelector(".mini-minus");
+          const plusBtn = row.querySelector(".mini-plus");
+          const removeBtn = row.querySelector(".mini-remove");
+          const qtySpan = row.querySelector(".selection-qty");
+
+          function syncToCard(newQty) {
+            const selectEl = document.querySelector('.qty-select[data-key="' + key + '"]');
+            if (!selectEl) return;
+            const card = selectEl.closest(".design-card");
+            selectEl.value = String(newQty);
+            updateSelection(key, newQty, card, { skipRebuildCart: true });
+            qtySpan.textContent = newQty;
+            // after updating selection, rebuild whole cart once at the end via updateSelectionSummary()
+          }
+
+          minusBtn.addEventListener("click", () => {
+            const current = parseInt(qtySpan.textContent, 10) || 0;
+            const next = Math.max(0, current - 1);
+            syncToCard(next);
+            updateSelectionSummary(); // rebuild cart & totals
+          });
+
+          plusBtn.addEventListener("click", () => {
+            const current = parseInt(qtySpan.textContent, 10) || 0;
+            const next = Math.min(99, current + 1);
+            syncToCard(next);
+            updateSelectionSummary();
+          });
+
+          removeBtn.addEventListener("click", () => {
+            syncToCard(0);
+            updateSelectionSummary();
+          });
+
+          selectionList.appendChild(row);
+        });
+      }
+
       /* ---------- FETCH DESIGNS ---------- */
       fetch("designs.json")
         .then(r => r.json())
@@ -836,7 +987,7 @@
         gallery.appendChild(card);
       }
 
-      function updateSelection(key, qty, card) {
+      function updateSelection(key, qty, card, opts = {}) {
         if (qty > 0) {
           selections[key] = qty;
           card.classList.add("selected");
@@ -850,8 +1001,11 @@
           formStatus.classList.remove("error");
         }
 
-        updateSelectionSummary();
         persistState();
+
+        if (!opts.skipRebuildCart) {
+          updateSelectionSummary();
+        }
       }
 
       function updateSelectionSummary() {
@@ -863,6 +1017,7 @@
           "Total selected: " + total + " sticker" + (total === 1 ? "" : "s");
 
         updatePriceSummary(total);
+        rebuildSelectionList();
         return total;
       }
 
