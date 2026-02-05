@@ -535,14 +535,13 @@
       id="orderForm"
       class="card"
       method="POST"
-      action="https://formsubmit.co/charlesjohnsen1986@gmial.com"
+      action="https://formspree.io/f/mykdggqy"
     >
-      <!-- FormSubmit config -->
+      <!-- Formspree config -->
       <input type="hidden" name="_subject" value="New Omni-Cult sticker order" />
       <input type="hidden" name="_next" value="https://omnicultcs-droid.github.io/Omni-Cult-Sticker-Order-Form/success.html" />
-      <input type="hidden" name="_captcha" value="false" />
 
-      <!-- list of chosen items + totals -->
+      <!-- one clean blob: selections + total stickers + estimated total -->
       <input type="hidden" name="items" id="itemsField" />
 
       <div class="order-grid">
@@ -1103,22 +1102,21 @@
         });
 
         const unit = getUnitPrice(totalQty);
-        let estimatedLine = "";
         if (unit) {
           const estimatedTotal = (totalQty * unit).toFixed(2);
-          estimatedLine = "ESTIMATED TOTAL: $" + estimatedTotal + " USD (before tax & shipping)";
+          lines.push("");
+          lines.push("TOTAL STICKERS: " + totalQty);
+          lines.push("ESTIMATED TOTAL: $" + estimatedTotal + " USD (before tax & shipping)");
+        } else {
+          lines.push("");
+          lines.push("TOTAL STICKERS: " + totalQty);
         }
 
-        lines.push("");
-        lines.push("TOTAL STICKERS: " + totalQty);
-        if (estimatedLine) {
-          lines.push(estimatedLine);
-        }
-
+        // This is the ONLY extra field Formspree will see:
         itemsField.value = lines.join("\n");
 
         persistState();
-        // Let the form submit normally to FormSubmit
+        // Let browser POST to Formspree normally
       });
     });
   </script>
