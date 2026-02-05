@@ -8,7 +8,6 @@
     :root {
       --oc-green: #22c55e;
       --oc-green2: #16a34a;
-      /* tweak these two if you want closer to your exact logo pink + glow */
       --oc-pink: #f472b6;
       --oc-pink2: #ec4899;
     }
@@ -45,14 +44,6 @@
       margin: 0 auto;
     }
 
-    .logo-caption {
-      margin-top: 4px;
-      font-size: 0.75rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: #9ca3af;
-    }
-
     h1 {
       margin: 10px 0 4px;
       font-size: 1.9rem;
@@ -61,11 +52,16 @@
       text-transform: uppercase;
     }
 
-    header p {
-      margin: 0;
-      font-size: 0.95rem;
-      font-weight: 500;
-      color: #cbd5e1;
+    /* >>> Updated instruction line <<< */
+    .instruction-line {
+      margin: 6px auto 0;
+      max-width: 900px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #d1fae5;
+      letter-spacing: 0.025em;
+      text-align: center;
+      line-height: 1.45;
     }
 
     .card {
@@ -130,13 +126,13 @@
       justify-content: space-between;
       align-items: center;
       gap: 8px;
-      margin-top: 6px;
+      margin-top: 8px;
       margin-bottom: 4px;
       font-size: 0.8rem;
       color: #9ca3af;
     }
 
-    /* FIXED EVEN GRID */
+    /* >>> Gallery grid <<< */
     .gallery {
       display: grid;
       gap: 12px;
@@ -151,29 +147,21 @@
 
     .design-card {
       border-radius: 10px;
-      padding: 6px 6px 24px; /* bottom padding so remove button doesn't change height */
+      padding: 6px 6px 30px;
       border: 1px solid #1f2937;
       background: #020617;
       display: flex;
       flex-direction: column;
       gap: 4px;
       font-size: 0.75rem;
-      position: relative; /* for bottom-right remove button */
+      position: relative;
     }
 
-    /* Thicker green outline, no size change */
     .design-card.selected {
       border-color: var(--oc-green);
       outline: 2px solid var(--oc-green);
       outline-offset: 0;
       box-shadow: 0 0 6px rgba(34,197,94,0.5);
-    }
-
-    .design-card.placeholder {
-      visibility: hidden;
-      border: none;
-      box-shadow: none;
-      outline: none;
     }
 
     .thumb-wrapper {
@@ -185,6 +173,7 @@
       align-items: center;
       justify-content: center;
     }
+
     .thumb-wrapper img {
       width: 100%;
       height: 100%;
@@ -267,7 +256,6 @@
       box-shadow: 0 0 14px rgba(244,114,182,0.65);
     }
 
-    /* qty +/- buttons use green look but small size */
     .qty-btn {
       width: 24px;
       height: 24px;
@@ -279,14 +267,13 @@
       justify-content: center;
     }
 
-    /* Remove button: bottom-right, pink gradient */
     .remove-btn {
       position: absolute;
       bottom: 6px;
       right: 6px;
       padding: 4px 10px;
       font-size: 0.7rem;
-      display: none; /* only when selected */
+      display: none;
       white-space: nowrap;
     }
     .design-card.selected .remove-btn {
@@ -295,7 +282,6 @@
       justify-content: center;
     }
 
-    /* Submit button – big green gradient */
     .submit-btn {
       margin-top: 16px;
       padding: 12px 18px;
@@ -328,15 +314,6 @@
     }
     .status.error { color: #fecaca; }
 
-    .small-note { font-size: 0.75rem; color: #9ca3af; }
-
-    .disclaimer {
-      font-size: 0.75rem;
-      color: #6b7280;
-      margin-top: 6px;
-      text-align: right;
-    }
-
     .selection-summary {
       margin-top: 6px;
       font-size: 1.05rem;
@@ -346,6 +323,14 @@
       letter-spacing: 0.04em;
       text-transform: uppercase;
     }
+
+    .disclaimer {
+      font-size: 0.75rem;
+      color: #6b7280;
+      margin-top: 6px;
+      text-align: right;
+    }
+
   </style>
 </head>
 
@@ -354,12 +339,15 @@
 
     <header>
       <div class="logo-wrapper">
-        <!-- logo.png lives next to index.html -->
         <img src="logo.png" alt="Omni-Cult logo" class="logo">
-        <div class="logo-caption">Sticker order form</div>
       </div>
+
       <h1>Sticker Order Form</h1>
-      <p>Select stickers, use +/− or the dropdown, and choose quantities (0–99). Colors may vary; pink line = sticker shape.</p>
+
+      <p class="instruction-line">
+        Select stickers by using +/- or the drop-down. Final printed colors may slightly vary.
+        Pink outline = sticker shape. Minimum order 200 stickers.
+      </p>
     </header>
 
     <form
@@ -368,21 +356,10 @@
       method="POST"
       action="https://formspree.io/f/mykdggqy"
     >
-      <!-- redirect back to success page after submit -->
-      <input
-        type="hidden"
-        name="_redirect"
-        value="https://omnicultcs-droid.github.io/Omni-Cult-Sticker-Order-Form/success.html"
-      />
-      <!-- subject line in your inbox -->
-      <input
-        type="hidden"
-        name="_subject"
-        value="New Omni-Cult sticker order"
-      />
-      <!-- list of chosen items -->
+      <input type="hidden" name="_redirect"
+        value="https://omnicultcs-droid.github.io/Omni-Cult-Sticker-Order-Form/success.html" />
+      <input type="hidden" name="_subject" value="New Omni-Cult sticker order" />
       <input type="hidden" name="items" id="itemsField" />
-      <!-- CC the customer (Formspree may ignore this on free plan, but it's safe) -->
       <input type="hidden" name="_cc" id="ccField" />
 
       <div class="order-grid">
@@ -396,7 +373,6 @@
         </div>
       </div>
 
-      <!-- Address block (all required) -->
       <div style="margin-top: 10px;">
         <label>Address</label>
         <input name="address" type="text" required autocomplete="street-address">
@@ -413,7 +389,7 @@
         </div>
       </div>
 
-      <div class="order-grid" style="margin-top: 10px%;">
+      <div class="order-grid" style="margin-top: 10px;">
         <div>
           <label>Postal / ZIP Code</label>
           <input name="postal" type="text" required autocomplete="postal-code">
@@ -431,7 +407,8 @@
 
       <div class="search-row">
         <label>Search stickers</label>
-        <input id="searchInput" type="search" placeholder="Type to filter… e.g. germs, skull, anime" />
+        <input id="searchInput" type="search"
+          placeholder="Type to filter… e.g. germs, skull, anime" />
       </div>
 
       <div class="toolbar">
@@ -444,11 +421,15 @@
       <div id="gallery" class="gallery"></div>
 
       <div class="load-more-wrap">
-        <button type="button" id="loadMoreBtn" class="load-more-btn green-btn">LOAD MORE</button>
+        <button type="button" id="loadMoreBtn" class="load-more-btn green-btn">
+          LOAD MORE
+        </button>
       </div>
 
       <p class="disclaimer">colors may vary; pink line = cutline.</p>
-      <p id="selectionSummary" class="selection-summary">Total selected: 0 stickers</p>
+      <p id="selectionSummary" class="selection-summary">
+        Total selected: 0 stickers
+      </p>
 
       <button type="submit" class="submit-btn green-btn">Submit order</button>
       <div id="formStatus" class="status"></div>
@@ -470,8 +451,8 @@
       const clearAllBtn = document.getElementById("clearAllBtn");
       const orderForm = document.getElementById("orderForm");
 
-      const emailInput = orderForm.querySelector('input[name="email"]');
       const nameInput = orderForm.querySelector('input[name="name"]');
+      const emailInput = orderForm.querySelector('input[name="email"]');
       const notesInput = orderForm.querySelector('textarea[name="notes"]');
       const addressInput = orderForm.querySelector('input[name="address"]');
       const cityInput = orderForm.querySelector('input[name="city"]');
@@ -481,33 +462,31 @@
       const ccField = document.getElementById("ccField");
       const selectionSummary = document.getElementById("selectionSummary");
 
-      let all = [];        // all designs
-      let filtered = [];   // filtered designs
-      let count = 0;       // how many currently rendered
-      let selections = {}; // { key: qty }
+      let all = [];
+      let filtered = [];
+      let count = 0;
+      let selections = {};
 
       loadMoreBtn.style.display = "none";
 
-      // ---------- Local storage helpers ----------
+      /* ---------- PERSIST STATE ---------- */
       function persistState() {
         try {
           const payload = {
             selections,
             form: {
-              name: nameInput.value || "",
-              email: emailInput.value || "",
-              notes: notesInput.value || "",
-              address: addressInput.value || "",
-              city: cityInput.value || "",
-              state: stateInput.value || "",
-              postal: postalInput.value || "",
-              country: countryInput.value || ""
+              name: nameInput.value,
+              email: emailInput.value,
+              notes: notesInput.value,
+              address: addressInput.value,
+              city: cityInput.value,
+              state: stateInput.value,
+              postal: postalInput.value,
+              country: countryInput.value
             }
           };
           localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
-        } catch (_) {
-          // ignore storage errors
-        }
+        } catch (_) {}
       }
 
       function loadState() {
@@ -515,29 +494,25 @@
           const raw = localStorage.getItem(STORAGE_KEY);
           if (!raw) return;
           const data = JSON.parse(raw);
-          if (data && data.selections) selections = data.selections || {};
-          if (data && data.form) {
-            if (data.form.name) nameInput.value = data.form.name;
-            if (data.form.email) emailInput.value = data.form.email;
-            if (data.form.notes) notesInput.value = data.form.notes;
-            if (data.form.address) addressInput.value = data.form.address;
-            if (data.form.city) cityInput.value = data.form.city;
-            if (data.form.state) stateInput.value = data.form.state;
-            if (data.form.postal) postalInput.value = data.form.postal;
-            if (data.form.country) countryInput.value = data.form.country;
+          if (data.selections) selections = data.selections;
+          if (data.form) {
+            nameInput.value = data.form.name || "";
+            emailInput.value = data.form.email || "";
+            notesInput.value = data.form.notes || "";
+            addressInput.value = data.form.address || "";
+            cityInput.value = data.form.city || "";
+            stateInput.value = data.form.state || "";
+            postalInput.value = data.form.postal || "";
+            countryInput.value = data.form.country || "";
           }
-        } catch (_) {
-          // ignore
-        }
+        } catch (_) {}
       }
 
-      // Save when user types in any form fields
       [nameInput, emailInput, notesInput,
-       addressInput, cityInput, stateInput, postalInput, countryInput].forEach(el => {
-        el.addEventListener("input", persistState);
-      });
+       addressInput, cityInput, stateInput, postalInput, countryInput]
+        .forEach(el => el.addEventListener("input", persistState));
 
-      // ---------- Fetch designs ----------
+      /* ---------- FETCH DESIGNS ---------- */
       fetch("designs.json")
         .then(r => r.json())
         .then(data => {
@@ -545,32 +520,24 @@
             const raw = d.img || d.image || d.src || d.file || "";
             const base = raw.substring(raw.lastIndexOf("/") + 1).replace(/\.[^.]+$/, "");
             const img = raw.includes("/") ? raw : "img/" + raw;
-            return {
-              key: String(i),
-              name: base.toLowerCase(),
-              display: base,
-              img
-            };
+            return { key: String(i), name: base.toLowerCase(), display: base, img };
           });
 
           all.sort((a, b) => a.display.localeCompare(b.display));
 
-          // Load saved selections & form values
           loadState();
-
           filtered = all.slice();
           resetAndRender();
         });
 
-      // ---------- Rendering ----------
+      /* ---------- RENDERING ---------- */
       function resetAndRender() {
         gallery.innerHTML = "";
         count = 0;
-        if (filtered.length > PAGE_SIZE) {
-          loadMoreBtn.style.display = "inline-block";
-        } else {
-          loadMoreBtn.style.display = filtered.length ? "inline-block" : "none";
-        }
+
+        if (filtered.length > PAGE_SIZE) loadMoreBtn.style.display = "inline-block";
+        else loadMoreBtn.style.display = filtered.length ? "inline-block" : "none";
+
         renderMore();
         updateSelectionSummary();
       }
@@ -581,9 +548,7 @@
         count += next.length;
         padGrid();
         updateGalleryStatus();
-        if (count >= filtered.length) {
-          loadMoreBtn.style.display = "none";
-        }
+        if (count >= filtered.length) loadMoreBtn.style.display = "none";
       }
 
       function addCard(design) {
@@ -615,7 +580,6 @@
         const plusBtn = card.querySelector(".qty-plus");
         const removeBtn = card.querySelector(".remove-btn");
 
-        // Apply saved selection if any
         const savedQty = selections[key];
         if (savedQty && savedQty > 0) {
           qty.value = String(savedQty);
@@ -702,7 +666,7 @@
 
       window.addEventListener("resize", padGrid);
 
-      // ---------- Search ----------
+      /* ---------- SEARCH ---------- */
       searchInput.addEventListener("input", () => {
         const q = searchInput.value.toLowerCase().trim();
         filtered = q
@@ -712,10 +676,10 @@
         resetAndRender();
       });
 
-      // ---------- Load more ----------
+      /* ---------- LOAD MORE ---------- */
       loadMoreBtn.addEventListener("click", renderMore);
 
-      // ---------- Clear all selections ----------
+      /* ---------- CLEAR ALL ---------- */
       clearAllBtn.addEventListener("click", () => {
         if (!Object.keys(selections).length) return;
 
@@ -727,7 +691,7 @@
         resetAndRender();
       });
 
-      // ---------- Submit ----------
+      /* ---------- SUBMIT ---------- */
       orderForm.addEventListener("submit", e => {
         const entries = Object.entries(selections);
         if (!entries.length) {
@@ -757,10 +721,7 @@
         });
 
         itemsField.value = lines.join("\n");
-
-        // Try to CC the customer so they get a copy of the order
-        ccField.value = (emailInput.value || "").trim();
-
+        ccField.value = emailInput.value.trim();
         persistState();
       });
     });
