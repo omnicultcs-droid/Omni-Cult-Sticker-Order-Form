@@ -1064,11 +1064,12 @@
         resetAndRender();
       });
 
-      /* ---------- SUBMIT ---------- */
-      orderForm.addEventListener("submit", e => {
+      /* ---------- SUBMIT (via fetch + redirect) ---------- */
+      orderForm.addEventListener("submit", async e => {
+        e.preventDefault(); // prevent browser from going to plain "OK" page
+
         const entries = Object.entries(selections);
         if (!entries.length) {
-          e.preventDefault();
           formStatus.textContent = "Select at least one sticker before submitting.";
           formStatus.classList.add("error");
           return;
@@ -1076,7 +1077,6 @@
 
         const total = updateSelectionSummary();
         if (total < MIN_TOTAL) {
-          e.preventDefault();
           const message =
             "A minimum of " + MIN_TOTAL + " stickers is required to proceed. " +
             "You currently have " + total + ".";
@@ -1113,7 +1113,22 @@
         itemsField.value = lines.join("\n");
 
         persistState();
-        // Let the browser POST to your Apps Script URL normally
+
+        formStatus.textContent = "Submitting order...";
+        formStatus.classList.remove("error");
+
+        try {
+          await fetch(orderForm.action, {
+            method: "POST",
+            body: new FormData(orderForm)
+          });
+
+          // Redirect to success page after successful submit
+          window.location.href = "success.html";
+        } catch (err) {
+          formStatus.textContent = "There was an error submitting your order. Please try again.";
+          formStatus.classList.add("error");
+        }
       });
     });
   </script>
