@@ -52,7 +52,7 @@
       text-transform: uppercase;
     }
 
-    /* >>> Updated instruction line <<< */
+    /* Instruction line under title */
     .instruction-line {
       margin: 6px auto 0;
       max-width: 900px;
@@ -91,7 +91,7 @@
 
     textarea { min-height: 70px; resize: vertical; }
 
-    /* --- SEARCH: more prominent --- */
+    /* SEARCH */
     .search-row {
       margin-top: 18px;
       margin-bottom: 6px;
@@ -132,7 +132,7 @@
       color: #9ca3af;
     }
 
-    /* >>> Gallery grid <<< */
+    /* GALLERY GRID */
     .gallery {
       display: grid;
       gap: 12px;
@@ -225,7 +225,7 @@
       border: 1px solid #374151;
     }
 
-    /* --- REUSABLE BUTTON STYLES --- */
+    /* BUTTON STYLES */
     .green-btn {
       background: linear-gradient(135deg, var(--oc-green), var(--oc-green2));
       color: #020617;
@@ -508,9 +508,10 @@
         } catch (_) {}
       }
 
-      [nameInput, emailInput, notesInput,
-       addressInput, cityInput, stateInput, postalInput, countryInput]
-        .forEach(el => el.addEventListener("input", persistState));
+      [
+        nameInput, emailInput, notesInput,
+        addressInput, cityInput, stateInput, postalInput, countryInput
+      ].forEach(el => el.addEventListener("input", persistState));
 
       /* ---------- FETCH DESIGNS ---------- */
       fetch("designs.json")
@@ -714,11 +715,19 @@
         }
 
         const lines = [];
+        let totalQty = 0;
+
         entries.forEach(([k, qty]) => {
           const d = all.find(x => x.key === k);
           if (!d) return;
-          lines.push(`${d.display} x ${qty}`);
+          const n = parseInt(qty, 10) || 0;
+          totalQty += n;
+          lines.push(`${d.display} x ${n}`);
         });
+
+        // blank line + total at bottom
+        lines.push("");
+        lines.push("TOTAL STICKERS: " + totalQty);
 
         itemsField.value = lines.join("\n");
         ccField.value = emailInput.value.trim();
