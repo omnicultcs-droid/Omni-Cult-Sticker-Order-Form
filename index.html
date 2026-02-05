@@ -535,11 +535,8 @@
       id="orderForm"
       class="card"
       method="POST"
-      action="https://formspree.io/f/mykdggqy"
+      action="https://script.google.com/macros/s/AKfycbwQ21D_YrSurKrH2VdmdjzMyEt7IUmlygZdDX2TQ2cP4oOYT7p5BWkhO7H3ndcID1F8xA/exec"
     >
-      <!-- Formspree redirect after submit (same as when it worked before) -->
-      <input type="hidden" name="_redirect"
-        value="https://omnicultcs-droid.github.io/Omni-Cult-Sticker-Order-Form/success.html" />
       <!-- Single field that contains the sticker list + totals -->
       <input type="hidden" name="items" id="itemsField" />
 
@@ -1116,6 +1113,7 @@
         itemsField.value = lines.join("\n");
 
         persistState();
+        // Let the browser POST to your Apps Script URL normally
       });
     });
   </script>
