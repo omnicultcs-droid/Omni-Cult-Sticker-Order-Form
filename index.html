@@ -5,6 +5,12 @@
   <title>Omni-Cult Sticker Order Form</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
+    :root {
+      --oc-green: #22c55e;
+      /* approximate neon pink accent from logo */
+      --oc-pink: #f472b6;
+    }
+
     * { box-sizing: border-box; }
     body {
       margin: 0;
@@ -143,10 +149,10 @@
       position: relative;
     }
 
-    /* Thicker green "outline" but no size change */
+    /* Thicker green outline, no size change */
     .design-card.selected {
-      border-color: #22c55e;
-      outline: 2px solid #22c55e;
+      border-color: var(--oc-green);
+      outline: 2px solid var(--oc-green);
       outline-offset: 0;
       box-shadow: 0 0 6px rgba(34,197,94,0.5);
     }
@@ -181,10 +187,11 @@
 
     .design-controls {
       display: flex;
-      justify-content: center;
+      justify-content: space-between;
       align-items: center;
       margin-top: 4px;
       font-size: 0.7rem;
+      gap: 6px;
     }
 
     .qty-block {
@@ -220,8 +227,8 @@
       width: 24px;
       height: 24px;
       border-radius: 999px;
-      border: 1px solid #22c55e;
-      background: #22c55e;
+      border: 1px solid var(--oc-green);
+      background: var(--oc-green);
       color: #020617;
       font-size: 0.9rem;
       font-weight: 800;
@@ -237,20 +244,21 @@
     }
 
     .remove-btn {
-      margin-top: 4px;
-      align-self: flex-end;
-      padding: 3px 8px;
+      padding: 4px 10px;
       border-radius: 999px;
-      border: 1px solid #4b5563;
-      background: #111827;
-      color: #e5e7eb;
-      font-size: 0.65rem;
+      border: 1px solid var(--oc-pink);
+      background: #1b1120;
+      color: var(--oc-pink);
+      font-size: 0.7rem;
       cursor: pointer;
-      display: none;
+      display: none; /* shown only when selected */
+      white-space: nowrap;
     }
 
     .design-card.selected .remove-btn {
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
 
     /* Buttons – unified Omni-Cult green accent for primary actions */
@@ -258,8 +266,8 @@
       margin-top: 16px;
       padding: 12px 18px;
       border-radius: 999px;
-      border: 1px solid #22c55e;
-      background: #22c55e;
+      border: 1px solid var(--oc-green);
+      background: var(--oc-green);
       color: #020617;
       font-weight: 800;
       cursor: pointer;
@@ -278,10 +286,10 @@
     .load-more-btn {
       padding: 10px 20px;
       border-radius: 999px;
-      border: 1px solid #22c55e;
+      border: 1px solid var(--oc-green);
       background: #0b1120;
       font-weight: 700;
-      color: #22c55e;
+      color: var(--oc-green);
       cursor: pointer;
       font-size: 0.95rem;
     }
@@ -290,15 +298,15 @@
     .clear-all-btn {
       padding: 6px 14px;
       border-radius: 999px;
-      border: 1px solid #f97316;
-      background: #111827;
-      color: #fed7aa;
+      border: 1px solid var(--oc-pink);
+      background: #1b1120;
+      color: var(--oc-pink);
       font-size: 0.75rem;
       cursor: pointer;
       white-space: nowrap;
     }
     .clear-all-btn:hover {
-      background: #7c2d12;
+      background: #3b1025;
     }
 
     .status {
@@ -321,7 +329,7 @@
       font-size: 1.05rem;
       font-weight: 800;
       text-align: right;
-      color: #22c55e;
+      color: var(--oc-green);
       letter-spacing: 0.04em;
       text-transform: uppercase;
     }
@@ -584,8 +592,8 @@
                 <button type="button" class="qty-btn qty-plus" data-key="${key}">+</button>
               </div>
             </div>
+            <button type="button" class="remove-btn" data-key="${key}">Remove</button>
           </div>
-          <button type="button" class="remove-btn" data-key="${key}">Remove</button>
         `;
 
         const qty = card.querySelector(".qty-select");
