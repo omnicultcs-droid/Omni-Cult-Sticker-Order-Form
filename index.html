@@ -1064,9 +1064,9 @@
         resetAndRender();
       });
 
-      /* ---------- SUBMIT (via fetch + redirect) ---------- */
-      orderForm.addEventListener("submit", async e => {
-        e.preventDefault(); // prevent browser from going to plain "OK" page
+      /* ---------- SUBMIT (real POST to Apps Script) ---------- */
+      orderForm.addEventListener("submit", e => {
+        e.preventDefault(); // we validate first, then do a real submit
 
         const entries = Object.entries(selections);
         if (!entries.length) {
@@ -1117,18 +1117,8 @@
         formStatus.textContent = "Submitting order...";
         formStatus.classList.remove("error");
 
-        try {
-          await fetch(orderForm.action, {
-            method: "POST",
-            body: new FormData(orderForm)
-          });
-
-          // Redirect to success page after successful submit
-          window.location.href = "success.html";
-        } catch (err) {
-          formStatus.textContent = "There was an error submitting your order. Please try again.";
-          formStatus.classList.add("error");
-        }
+        // 🔑 Let the browser POST to Apps Script and show the HTML from doPost()
+        orderForm.submit();
       });
     });
   </script>
