@@ -52,16 +52,19 @@
       text-transform: uppercase;
     }
 
-    /* Instruction line under title */
+    /* Instruction line: forced to one line */
     .instruction-line {
       margin: 6px auto 0;
-      max-width: 900px;
-      font-size: 1.05rem;
+      max-width: 1200px;         /* wide so it can stretch */
+      font-size: 0.95rem;        /* slightly smaller so it fits */
       font-weight: 600;
       color: #d1fae5;
-      letter-spacing: 0.025em;
+      letter-spacing: 0.02em;
       text-align: center;
-      line-height: 1.45;
+      line-height: 1.2;
+      white-space: nowrap;       /* keep as a single line */
+      overflow: hidden;          /* avoid ugly scrollbars */
+      text-overflow: ellipsis;   /* just in case on tiny screens */
     }
 
     .card {
@@ -725,7 +728,7 @@
           lines.push(`${d.display} x ${n}`);
         });
 
-        // blank line + total at bottom
+        // blank line + TOTAL line at bottom
         lines.push("");
         lines.push("TOTAL STICKERS: " + totalQty);
 
