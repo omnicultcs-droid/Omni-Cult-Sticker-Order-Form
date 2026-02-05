@@ -143,8 +143,11 @@
       position: relative;
     }
 
+    /* Thicker green "outline" but no size change */
     .design-card.selected {
       border-color: #22c55e;
+      outline: 2px solid #22c55e;
+      outline-offset: 0;
       box-shadow: 0 0 6px rgba(34,197,94,0.5);
     }
 
@@ -152,6 +155,7 @@
       visibility: hidden;
       border: none;
       box-shadow: none;
+      outline: none;
     }
 
     .thumb-wrapper {
@@ -177,21 +181,24 @@
 
     .design-controls {
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
       margin-top: 4px;
       font-size: 0.7rem;
-      gap: 6px;
     }
 
-    /* Make checkbox + label a bit larger */
-    .design-controls label {
+    .qty-block {
       display: flex;
+      flex-direction: column;
       align-items: center;
       gap: 4px;
     }
-    .design-controls input[type="checkbox"] {
-      transform: scale(1.15);
+
+    .qty-label {
+      font-weight: 700;
+      font-size: 0.8rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
     }
 
     .qty-group {
@@ -200,7 +207,6 @@
       gap: 4px;
     }
 
-    /* Slightly larger select to match plus/minus */
     .design-controls select {
       padding: 4px 6px;
       font-size: 0.8rem;
@@ -332,7 +338,7 @@
         <div class="logo-caption">Sticker order form</div>
       </div>
       <h1>Sticker Order Form</h1>
-      <p>Select stickers, tick the box, and choose quantities (0–99). Colors may vary; pink line = sticker shape.</p>
+      <p>Select stickers, use +/− or the dropdown, and choose quantities (0–99). Colors may vary; pink line = sticker shape.</p>
     </header>
 
     <form
@@ -366,6 +372,34 @@
         <div>
           <label>Email</label>
           <input name="email" type="email" required autocomplete="email">
+        </div>
+      </div>
+
+      <!-- Address block (all required) -->
+      <div style="margin-top: 10px;">
+        <label>Address</label>
+        <input name="address" type="text" required autocomplete="street-address">
+      </div>
+
+      <div class="order-grid" style="margin-top: 10px;">
+        <div>
+          <label>City</label>
+          <input name="city" type="text" required autocomplete="address-level2">
+        </div>
+        <div>
+          <label>State / Province</label>
+          <input name="state" type="text" required autocomplete="address-level1">
+        </div>
+      </div>
+
+      <div class="order-grid" style="margin-top: 10px;">
+        <div>
+          <label>Postal / ZIP Code</label>
+          <input name="postal" type="text" required autocomplete="postal-code">
+        </div>
+        <div>
+          <label>Country</label>
+          <input name="country" type="text" required autocomplete="country-name">
         </div>
       </div>
 
@@ -417,6 +451,11 @@
       const emailInput = orderForm.querySelector('input[name="email"]');
       const nameInput = orderForm.querySelector('input[name="name"]');
       const notesInput = orderForm.querySelector('textarea[name="notes"]');
+      const addressInput = orderForm.querySelector('input[name="address"]');
+      const cityInput = orderForm.querySelector('input[name="city"]');
+      const stateInput = orderForm.querySelector('input[name="state"]');
+      const postalInput = orderForm.querySelector('input[name="postal"]');
+      const countryInput = orderForm.querySelector('input[name="country"]');
       const ccField = document.getElementById("ccField");
       const selectionSummary = document.getElementById("selectionSummary");
 
@@ -435,7 +474,12 @@
             form: {
               name: nameInput.value || "",
               email: emailInput.value || "",
-              notes: notesInput.value || ""
+              notes: notesInput.value || "",
+              address: addressInput.value || "",
+              city: cityInput.value || "",
+              state: stateInput.value || "",
+              postal: postalInput.value || "",
+              country: countryInput.value || ""
             }
           };
           localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
@@ -454,15 +498,22 @@
             if (data.form.name) nameInput.value = data.form.name;
             if (data.form.email) emailInput.value = data.form.email;
             if (data.form.notes) notesInput.value = data.form.notes;
+            if (data.form.address) addressInput.value = data.form.address;
+            if (data.form.city) cityInput.value = data.form.city;
+            if (data.form.state) stateInput.value = data.form.state;
+            if (data.form.postal) postalInput.value = data.form.postal;
+            if (data.form.country) countryInput.value = data.form.country;
           }
         } catch (_) {
           // ignore
         }
       }
 
-      nameInput.addEventListener("input", persistState);
-      emailInput.addEventListener("input", persistState);
-      notesInput.addEventListener("input", persistState);
+      // Save when user types in any form fields
+      [nameInput, emailInput, notesInput,
+       addressInput, cityInput, stateInput, postalInput, countryInput].forEach(el => {
+        el.addEventListener("input", persistState);
+      });
 
       // ---------- Fetch designs ----------
       fetch("designs.json")
@@ -523,12 +574,8 @@
           <div class="thumb-wrapper"><img src="${design.img}" alt="${design.display}"></div>
           <div class="design-name">${design.display}</div>
           <div class="design-controls">
-            <label>
-              <input type="checkbox" class="sel-toggle" data-key="${key}">
-              Select
-            </label>
-            <div>
-              <span>Qty</span>
+            <div class="qty-block">
+              <div class="qty-label">QTY</div>
               <div class="qty-group">
                 <button type="button" class="qty-btn qty-minus" data-key="${key}">−</button>
                 <select class="qty-select" data-key="${key}">
@@ -541,7 +588,6 @@
           <button type="button" class="remove-btn" data-key="${key}">Remove</button>
         `;
 
-        const checkbox = card.querySelector(".sel-toggle");
         const qty = card.querySelector(".qty-select");
         const minusBtn = card.querySelector(".qty-minus");
         const plusBtn = card.querySelector(".qty-plus");
@@ -550,52 +596,39 @@
         // Apply saved selection if any
         const savedQty = selections[key];
         if (savedQty && savedQty > 0) {
-          checkbox.checked = true;
           qty.value = String(savedQty);
           card.classList.add("selected");
         }
 
-        checkbox.addEventListener("change", () => {
-          if (checkbox.checked && qty.value === "0") qty.value = "1";
-          updateSelection(key, parseInt(qty.value, 10), checkbox.checked, card);
-        });
-
         qty.addEventListener("change", () => {
           const n = parseInt(qty.value, 10) || 0;
-          checkbox.checked = n > 0;
-          updateSelection(key, n, checkbox.checked, card);
+          updateSelection(key, n, card);
         });
 
         minusBtn.addEventListener("click", () => {
           let n = parseInt(qty.value, 10) || 0;
           if (n > 0) n -= 1;
           qty.value = String(n);
-          const isChecked = n > 0;
-          checkbox.checked = isChecked;
-          updateSelection(key, n, isChecked, card);
+          updateSelection(key, n, card);
         });
 
         plusBtn.addEventListener("click", () => {
           let n = parseInt(qty.value, 10) || 0;
           if (n < 99) n += 1;
           qty.value = String(n);
-          const isChecked = n > 0;
-          checkbox.checked = isChecked;
-          updateSelection(key, n, isChecked, card);
+          updateSelection(key, n, card);
         });
 
         removeBtn.addEventListener("click", () => {
-          // just this sticker
-          checkbox.checked = false;
           qty.value = "0";
-          updateSelection(key, 0, false, card);
+          updateSelection(key, 0, card);
         });
 
         gallery.appendChild(card);
       }
 
-      function updateSelection(key, qty, isChecked, card) {
-        if (isChecked && qty > 0) {
+      function updateSelection(key, qty, card) {
+        if (qty > 0) {
           selections[key] = qty;
           card.classList.add("selected");
         } else {
