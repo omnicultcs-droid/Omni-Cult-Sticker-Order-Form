@@ -52,19 +52,19 @@
       text-transform: uppercase;
     }
 
-    /* Instruction line: forced to one line */
+    /* Instruction line: one clean line on larger screens */
     .instruction-line {
       margin: 6px auto 0;
-      max-width: 1200px;         /* wide so it can stretch */
-      font-size: 0.95rem;        /* slightly smaller so it fits */
+      max-width: 1200px;
+      font-size: 0.95rem;
       font-weight: 600;
       color: #d1fae5;
       letter-spacing: 0.02em;
       text-align: center;
       line-height: 1.2;
-      white-space: nowrap;       /* keep as a single line */
-      overflow: hidden;          /* avoid ugly scrollbars */
-      text-overflow: ellipsis;   /* just in case on tiny screens */
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .card {
@@ -93,6 +93,12 @@
     }
 
     textarea { min-height: 70px; resize: vertical; }
+
+    .field-help {
+      font-size: 0.75rem;
+      color: #9ca3af;
+      margin-top: 2px;
+    }
 
     /* SEARCH */
     .search-row {
@@ -135,6 +141,8 @@
       color: #9ca3af;
     }
 
+    .small-note { font-size: 0.75rem; color: #9ca3af; }
+
     /* GALLERY GRID */
     .gallery {
       display: grid;
@@ -165,6 +173,13 @@
       outline: 2px solid var(--oc-green);
       outline-offset: 0;
       box-shadow: 0 0 6px rgba(34,197,94,0.5);
+    }
+
+    .design-card.placeholder {
+      visibility: hidden;
+      border: none;
+      box-shadow: none;
+      padding: 0;
     }
 
     .thumb-wrapper {
@@ -317,8 +332,98 @@
     }
     .status.error { color: #fecaca; }
 
-    .selection-summary {
+    .disclaimer {
+      font-size: 0.75rem;
+      color: #6b7280;
       margin-top: 6px;
+      text-align: right;
+    }
+
+    /* SUMMARY ROW: pricing table / calculator / total */
+    .summary-row {
+      margin-top: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .summary-col {
+      flex: 1 1 100%;
+    }
+
+    @media (min-width: 900px) {
+      .summary-col {
+        flex: 1 1 0;
+      }
+    }
+
+    .pricing-table {
+      border: 1px solid #1f2937;
+      border-radius: 10px;
+      padding: 10px 12px;
+      background: #020617;
+      font-size: 0.8rem;
+    }
+
+    .pricing-table h3 {
+      margin: 0 0 6px;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--oc-green);
+    }
+
+    .pricing-table table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.78rem;
+    }
+
+    .pricing-table th,
+    .pricing-table td {
+      padding: 2px 0;
+      text-align: left;
+    }
+
+    .pricing-table th {
+      font-weight: 600;
+      color: #e5e7eb;
+    }
+
+    .pricing-table td {
+      color: #d1d5db;
+    }
+
+    .pricing-table tr.highlight td {
+      color: var(--oc-green);
+      font-weight: 700;
+    }
+
+    .price-summary {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #e5e7eb;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid #1f2937;
+      background: #020617;
+      line-height: 1.4;
+    }
+
+    .price-summary .line-strong {
+      color: var(--oc-green);
+      font-size: 0.95rem;
+    }
+
+    .tax-note {
+      margin-top: 6px;
+      font-size: 0.75rem;
+      color: #9ca3af;
+    }
+
+    .selection-summary {
+      margin-top: 0;
       font-size: 1.05rem;
       font-weight: 800;
       text-align: right;
@@ -327,11 +432,10 @@
       text-transform: uppercase;
     }
 
-    .disclaimer {
-      font-size: 0.75rem;
-      color: #6b7280;
-      margin-top: 6px;
-      text-align: right;
+    @media (max-width: 899px) {
+      .selection-summary {
+        text-align: left;
+      }
     }
 
   </style>
@@ -348,8 +452,7 @@
       <h1>Sticker Order Form</h1>
 
       <p class="instruction-line">
-        Select stickers by using +/- or the drop-down. Final printed colors may slightly vary.
-        Pink outline = sticker shape. Minimum order 200 stickers.
+        Select stickers by using +/- or the drop-down. Final printed colors may slightly vary. Pink outline = sticker shape. Minimum order 200 stickers.
       </p>
     </header>
 
@@ -404,6 +507,12 @@
       </div>
 
       <div style="margin-top: 10px;">
+        <label>Reseller Permit / Tax ID (optional)</label>
+        <input name="reseller_id" type="text" autocomplete="off">
+        <div class="field-help">Leave blank if you do not have a reseller permit.</div>
+      </div>
+
+      <div style="margin-top: 10px;">
         <label>Order notes</label>
         <textarea name="notes"></textarea>
       </div>
@@ -430,9 +539,52 @@
       </div>
 
       <p class="disclaimer">colors may vary; pink line = cutline.</p>
-      <p id="selectionSummary" class="selection-summary">
-        Total selected: 0 stickers
-      </p>
+
+      <!-- SUMMARY ROW: pricing table / calculator / total -->
+      <div class="summary-row">
+        <!-- Left: Pricing table -->
+        <div class="summary-col">
+          <div class="pricing-table">
+            <h3>Wholesale Pricing (USD)</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Qty Range</th>
+                  <th>Price / sticker</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>200–499</td><td>$0.90</td></tr>
+                <tr><td>500–999</td><td>$0.80</td></tr>
+                <tr><td>1000–1999</td><td>$0.75</td></tr>
+                <tr><td>2000–2999</td><td>$0.70</td></tr>
+                <tr><td>3000–3999</td><td>$0.65</td></tr>
+                <tr><td>4000–4999</td><td>$0.60</td></tr>
+                <tr><td>5000+</td><td>$0.55</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Middle: Live price calculator -->
+        <div class="summary-col">
+          <div id="priceSummary" class="price-summary">
+            <div class="line-strong">Estimated total: –</div>
+            <div>Increase your selection to unlock wholesale pricing.</div>
+          </div>
+          <div class="tax-note">
+            Final invoice will include any applicable sales tax.
+            California orders without a valid reseller permit are taxable.
+          </div>
+        </div>
+
+        <!-- Right: Total selected -->
+        <div class="summary-col">
+          <p id="selectionSummary" class="selection-summary">
+            Total selected: 0 stickers
+          </p>
+        </div>
+      </div>
 
       <button type="submit" class="submit-btn green-btn">Submit order</button>
       <div id="formStatus" class="status"></div>
@@ -462,8 +614,10 @@
       const stateInput = orderForm.querySelector('input[name="state"]');
       const postalInput = orderForm.querySelector('input[name="postal"]');
       const countryInput = orderForm.querySelector('input[name="country"]');
+      const resellerInput = orderForm.querySelector('input[name="reseller_id"]');
       const ccField = document.getElementById("ccField");
       const selectionSummary = document.getElementById("selectionSummary");
+      const priceSummary = document.getElementById("priceSummary");
 
       let all = [];
       let filtered = [];
@@ -485,7 +639,8 @@
               city: cityInput.value,
               state: stateInput.value,
               postal: postalInput.value,
-              country: countryInput.value
+              country: countryInput.value,
+              reseller_id: resellerInput.value
             }
           };
           localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
@@ -507,14 +662,73 @@
             stateInput.value = data.form.state || "";
             postalInput.value = data.form.postal || "";
             countryInput.value = data.form.country || "";
+            resellerInput.value = data.form.reseller_id || "";
           }
         } catch (_) {}
       }
 
       [
         nameInput, emailInput, notesInput,
-        addressInput, cityInput, stateInput, postalInput, countryInput
+        addressInput, cityInput, stateInput, postalInput, countryInput, resellerInput
       ].forEach(el => el.addEventListener("input", persistState));
+
+      /* ---------- PRICING LOGIC ---------- */
+      function getUnitPrice(total) {
+        if (total >= 5000) return 0.55;
+        if (total >= 4000) return 0.60;
+        if (total >= 3000) return 0.65;
+        if (total >= 2000) return 0.70;
+        if (total >= 1000) return 0.75;
+        if (total >= 500)  return 0.80;
+        if (total >= 200)  return 0.90;
+        return null; // below minimum
+      }
+
+      function getNextTierInfo(total) {
+        if (total < 200)  return { at: 200, price: 0.90 };
+        if (total < 500)  return { at: 500, price: 0.80 };
+        if (total < 1000) return { at: 1000, price: 0.75 };
+        if (total < 2000) return { at: 2000, price: 0.70 };
+        if (total < 3000) return { at: 3000, price: 0.65 };
+        if (total < 4000) return { at: 4000, price: 0.60 };
+        if (total < 5000) return { at: 5000, price: 0.55 };
+        return null;
+      }
+
+      function updatePriceSummary(total) {
+        const unit = getUnitPrice(total);
+
+        if (!unit) {
+          // Below 200 stickers
+          priceSummary.innerHTML = `
+            <div class="line-strong">Estimated total: –</div>
+            <div>Select at least 200 stickers to unlock wholesale pricing.</div>
+          `;
+          return;
+        }
+
+        const est = (total * unit).toFixed(2);
+        const next = getNextTierInfo(total);
+
+        let html = `
+          <div class="line-strong">Estimated total: $${est} USD</div>
+          <div>${total} stickers at $${unit.toFixed(2)} each (before tax & shipping).</div>
+        `;
+
+        if (next) {
+          const diff = next.at - total;
+          if (diff > 0) {
+            html += `
+              <div style="margin-top:4px;font-size:0.8rem;color:#9ca3af;">
+                Add ${diff} more sticker${diff === 1 ? "" : "s"} to reach
+                ${next.at} at $${next.price.toFixed(2)} each.
+              </div>
+            `;
+          }
+        }
+
+        priceSummary.innerHTML = html;
+      }
 
       /* ---------- FETCH DESIGNS ---------- */
       fetch("designs.json")
@@ -642,6 +856,8 @@
         );
         selectionSummary.textContent =
           "Total selected: " + total + " sticker" + (total === 1 ? "" : "s");
+
+        updatePriceSummary(total);
         return total;
       }
 
@@ -728,9 +944,20 @@
           lines.push(`${d.display} x ${n}`);
         });
 
-        // blank line + TOTAL line at bottom
+        // Calculate estimated total price using same tier logic
+        const unit = getUnitPrice(totalQty);
+        let estimatedLine = "";
+        if (unit) {
+          const estimatedTotal = (totalQty * unit).toFixed(2);
+          estimatedLine = "ESTIMATED TOTAL: $" + estimatedTotal + " USD (before tax & shipping)";
+        }
+
+        // blank line + TOTAL line + ESTIMATED PRICE line at bottom
         lines.push("");
         lines.push("TOTAL STICKERS: " + totalQty);
+        if (estimatedLine) {
+          lines.push(estimatedLine);
+        }
 
         itemsField.value = lines.join("\n");
         ccField.value = emailInput.value.trim();
