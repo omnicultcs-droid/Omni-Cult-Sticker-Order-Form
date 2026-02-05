@@ -7,8 +7,10 @@
   <style>
     :root {
       --oc-green: #22c55e;
-      /* approximate neon pink accent from logo */
+      --oc-green2: #16a34a;
+      /* tweak these two if you want closer to your exact logo pink + glow */
       --oc-pink: #f472b6;
+      --oc-pink2: #ec4899;
     }
 
     * { box-sizing: border-box; }
@@ -93,23 +95,33 @@
 
     textarea { min-height: 70px; resize: vertical; }
 
+    /* --- SEARCH: more prominent --- */
     .search-row {
-      margin-top: 14px;
-      margin-bottom: 4px;
+      margin-top: 18px;
+      margin-bottom: 6px;
     }
     .search-row label {
       display: block;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       margin-bottom: 4px;
-      color: #d1d5db;
+      color: var(--oc-green);
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
     }
     .search-row input {
       width: 100%;
-      padding: 7px 9px;
-      border-radius: 6px;
-      border: 1px solid #374151;
+      padding: 9px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--oc-green);
       background: #020617;
       color: #f9fafb;
+      font-size: 0.95rem;
+      outline: none;
+      box-shadow: 0 0 0 1px rgba(34,197,94,0.25);
+    }
+    .search-row input::placeholder {
+      color: #6b7280;
       font-size: 0.9rem;
     }
 
@@ -139,14 +151,14 @@
 
     .design-card {
       border-radius: 10px;
-      padding: 6px;
+      padding: 6px 6px 24px; /* bottom padding so remove button doesn't change height */
       border: 1px solid #1f2937;
       background: #020617;
       display: flex;
       flex-direction: column;
       gap: 4px;
       font-size: 0.75rem;
-      position: relative;
+      position: relative; /* for bottom-right remove button */
     }
 
     /* Thicker green outline, no size change */
@@ -185,13 +197,13 @@
       color: #e5e7eb;
     }
 
+    /* QTY centered */
     .design-controls {
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
       margin-top: 4px;
       font-size: 0.7rem;
-      gap: 6px;
     }
 
     .qty-block {
@@ -199,6 +211,7 @@
       flex-direction: column;
       align-items: center;
       gap: 4px;
+      text-align: center;
     }
 
     .qty-label {
@@ -223,60 +236,74 @@
       border: 1px solid #374151;
     }
 
+    /* --- REUSABLE BUTTON STYLES --- */
+    .green-btn {
+      background: linear-gradient(135deg, var(--oc-green), var(--oc-green2));
+      color: #020617;
+      font-weight: 800;
+      box-shadow: 0 0 10px rgba(34,197,94,0.45);
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: .15s ease;
+    }
+    .green-btn:hover {
+      filter: brightness(1.12);
+      box-shadow: 0 0 14px rgba(34,197,94,0.65);
+    }
+
+    .pink-btn {
+      background: linear-gradient(135deg, var(--oc-pink), var(--oc-pink2));
+      color: #020617;
+      font-weight: 700;
+      box-shadow: 0 0 10px rgba(244,114,182,0.45);
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: .15s ease;
+    }
+    .pink-btn:hover {
+      filter: brightness(1.12);
+      box-shadow: 0 0 14px rgba(244,114,182,0.65);
+    }
+
+    /* qty +/- buttons use green look but small size */
     .qty-btn {
       width: 24px;
       height: 24px;
-      border-radius: 999px;
-      border: 1px solid var(--oc-green);
-      background: var(--oc-green);
-      color: #020617;
       font-size: 0.9rem;
-      font-weight: 800;
       line-height: 1;
       padding: 0;
-      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
     }
-    .qty-btn:hover {
-      filter: brightness(1.07);
-    }
 
+    /* Remove button: bottom-right, pink gradient */
     .remove-btn {
+      position: absolute;
+      bottom: 6px;
+      right: 6px;
       padding: 4px 10px;
-      border-radius: 999px;
-      border: 1px solid var(--oc-pink);
-      background: #1b1120;
-      color: var(--oc-pink);
       font-size: 0.7rem;
-      cursor: pointer;
-      display: none; /* shown only when selected */
+      display: none; /* only when selected */
       white-space: nowrap;
     }
-
     .design-card.selected .remove-btn {
-      display: inline-flex;
+      display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    /* Buttons – unified Omni-Cult green accent for primary actions */
+    /* Submit button – big green gradient */
     .submit-btn {
       margin-top: 16px;
       padding: 12px 18px;
-      border-radius: 999px;
-      border: 1px solid var(--oc-green);
-      background: var(--oc-green);
-      color: #020617;
-      font-weight: 800;
-      cursor: pointer;
       font-size: 1rem;
       width: 100%;
       letter-spacing: 0.04em;
       text-transform: uppercase;
     }
-    .submit-btn:hover { filter: brightness(1.07); }
 
     .load-more-wrap {
       text-align: center;
@@ -285,28 +312,14 @@
 
     .load-more-btn {
       padding: 10px 20px;
-      border-radius: 999px;
-      border: 1px solid var(--oc-green);
-      background: #0b1120;
-      font-weight: 700;
-      color: var(--oc-green);
-      cursor: pointer;
       font-size: 0.95rem;
+      font-weight: 700;
     }
-    .load-more-btn:hover { background: #111827; }
 
     .clear-all-btn {
       padding: 6px 14px;
-      border-radius: 999px;
-      border: 1px solid var(--oc-pink);
-      background: #1b1120;
-      color: var(--oc-pink);
       font-size: 0.75rem;
-      cursor: pointer;
       white-space: nowrap;
-    }
-    .clear-all-btn:hover {
-      background: #3b1025;
     }
 
     .status {
@@ -400,7 +413,7 @@
         </div>
       </div>
 
-      <div class="order-grid" style="margin-top: 10px;">
+      <div class="order-grid" style="margin-top: 10px%;">
         <div>
           <label>Postal / ZIP Code</label>
           <input name="postal" type="text" required autocomplete="postal-code">
@@ -423,7 +436,7 @@
 
       <div class="toolbar">
         <span id="galleryStatus" class="small-note"></span>
-        <button type="button" id="clearAllBtn" class="clear-all-btn">
+        <button type="button" id="clearAllBtn" class="clear-all-btn pink-btn">
           Remove all selections
         </button>
       </div>
@@ -431,13 +444,13 @@
       <div id="gallery" class="gallery"></div>
 
       <div class="load-more-wrap">
-        <button type="button" id="loadMoreBtn" class="load-more-btn">LOAD MORE</button>
+        <button type="button" id="loadMoreBtn" class="load-more-btn green-btn">LOAD MORE</button>
       </div>
 
       <p class="disclaimer">colors may vary; pink line = cutline.</p>
       <p id="selectionSummary" class="selection-summary">Total selected: 0 stickers</p>
 
-      <button type="submit" class="submit-btn">Submit order</button>
+      <button type="submit" class="submit-btn green-btn">Submit order</button>
       <div id="formStatus" class="status"></div>
     </form>
   </div>
@@ -456,6 +469,7 @@
       const galleryStatus = document.getElementById("galleryStatus");
       const clearAllBtn = document.getElementById("clearAllBtn");
       const orderForm = document.getElementById("orderForm");
+
       const emailInput = orderForm.querySelector('input[name="email"]');
       const nameInput = orderForm.querySelector('input[name="name"]');
       const notesInput = orderForm.querySelector('textarea[name="notes"]');
@@ -585,15 +599,15 @@
             <div class="qty-block">
               <div class="qty-label">QTY</div>
               <div class="qty-group">
-                <button type="button" class="qty-btn qty-minus" data-key="${key}">−</button>
+                <button type="button" class="qty-btn green-btn qty-minus" data-key="${key}">−</button>
                 <select class="qty-select" data-key="${key}">
                   ${Array.from({length: 100}, (_, x) => `<option value="${x}">${x}</option>`).join("")}
                 </select>
-                <button type="button" class="qty-btn qty-plus" data-key="${key}">+</button>
+                <button type="button" class="qty-btn green-btn qty-plus" data-key="${key}">+</button>
               </div>
             </div>
-            <button type="button" class="remove-btn" data-key="${key}">Remove</button>
           </div>
+          <button type="button" class="remove-btn pink-btn" data-key="${key}">Remove</button>
         `;
 
         const qty = card.querySelector(".qty-select");
